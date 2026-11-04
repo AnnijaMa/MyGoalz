@@ -148,6 +148,7 @@
   .meal .mt { flex: 1; min-width: 0; }
   .meal .mt .note { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .meal .mt .sub { color: var(--muted); font-size: 13px; }
+  .macros { color: var(--muted); font-size: 13px; margin-top: 8px; font-variant-numeric: tabular-nums; }
   .empty-note { color: var(--muted); font-size: 14px; margin-top: 10px; }
 
   .sheet-bg { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: none; z-index: 10; }
@@ -216,6 +217,7 @@
       <label>📷 Take photo<input type="file" id="photoInput" accept="image/*" hidden></label>
       <button class="alt" id="noPhotoBtn">✏️ Type it</button>
     </div>
+    <div class="macros" id="macroTotals"></div>
     <div class="meals" id="meals"></div>
   </section>
 
@@ -266,6 +268,10 @@
     <div class="row2">
       <div><label class="lbl" for="mealKcal">Calories (kcal)</label><input type="number" inputmode="numeric" id="mealKcal" min="0"></div>
       <div><label class="lbl" for="mealProt">Protein (g)</label><input type="number" inputmode="decimal" id="mealProt" min="0"></div>
+      <div><label class="lbl" for="mealCarbs">Carbs (g)</label><input type="number" inputmode="decimal" id="mealCarbs" min="0"></div>
+      <div><label class="lbl" for="mealFat">Fat (g)</label><input type="number" inputmode="decimal" id="mealFat" min="0"></div>
+      <div><label class="lbl" for="mealFiber">Fiber (g)</label><input type="number" inputmode="decimal" id="mealFiber" min="0"></div>
+      <div><label class="lbl" for="mealSugar">Sugar (g)</label><input type="number" inputmode="decimal" id="mealSugar" min="0"></div>
     </div>
     <div class="actions">
       <button class="btn danger" id="mealDelete">Delete</button>
@@ -496,21 +502,25 @@
   }
   const blobToBase64 = b => new Promise(r => { const fr = new FileReader(); fr.onload = () => r(fr.result.split(',')[1]); fr.readAsDataURL(b); });
 
+  const MACROS = [{ key: 'carbs', el: 'Carbs' }, { key: 'fat', el: 'Fat' }, { key: 'fiber', el: 'Fiber' }, { key: 'sugar', el: 'Sugar' }];
   const mealsOf = d => (data[ymd(d)] && data[ymd(d)].meals) || [];
   const num = v => (v === '' || v == null || isNaN(Number(v))) ? null : Math.round(Number(v));
 
   async function renderFood() {
     const meals = mealsOf(selected);
-    const kcal = meals.reduce((a, m) => a + (m.kcal || 0), 0);
-    const prot = meals.reduce((a, m) => a + (m.protein || 0), 0);
+    const sum = f => meals.reduce((a, m) => a + (m[f] || 0), 0);
+    const kcal = sum('kcal'), prot = sum('protein');
     $('foodTotals').innerHTML =
       `<b>${kcal}</b>${settings.kcal ? ' / ' + settings.kcal : ''} kcal<br><b>${prot}</b>${settings.prot ? ' / ' + settings.prot : ''} g protein`;
+    $('macroTotals').textContent = meals.length
+      ? `Carbs ${sum('carbs')} g · Fat ${sum('fat')} g · Fiber ${sum('fiber')} g · Sugar ${sum('sugar')} g` : '';
     const list = $('meals'); list.innerHTML = '';
     if (!meals.length) { list.innerHTML = '<div class="empty-note">No meals logged for this day yet.</div>'; return; }
     for (const m of [...meals].sort((a, b) => a.time.localeCompare(b.time))) {
       const row = document.createElement('div'); row.className = 'meal';
       const t = new Date(m.time).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-      const bits = [t, m.kcal != null ? `${m.kcal} kcal` : null, m.protein != null ? `${m.protein} g protein` : null].filter(Boolean);
+      const bits = [t, m.kcal != null ? `${m.kcal} kcal` : null, m.protein != null ? `${m.protein} g protein` : null,
+        m.carbs != null ? `${m.carbs} g carbs` : null, m.fat != null ? `${m.fat} g fat` : null].filter(Boolean);
       row.innerHTML = `<div class="ph">🍽️</div><div class="mt"><div class="note"></div><div class="sub">${bits.join(' · ')}</div></div>`;
       row.querySelector('.note').textContent = m.note || 'Meal';
       if (m.photo) photoURL(m.photo).then(u => {
@@ -534,6 +544,7 @@
     $('mealNote').value = meal.note || '';
     $('mealKcal').value = meal.kcal ?? '';
     $('mealProt').value = meal.protein ?? '';
+    for (const f of MACROS) $('meal' + f.el).value = meal[f.key] ?? '';
     $('aiOut').textContent = meal.ai || '';
     $('mealDelete').style.display = isNew ? 'none' : '';
     const img = $('mealImg');
@@ -552,7 +563,8 @@
     const f = ev.target.files[0]; ev.target.value = ''; if (!f) return;
     try {
       const blob = await compressImage(f);
-      openMeal({ id: 'm' + Date.now(), time: newMealTime() }, true, blob);
+      await openMeal({ id: 'm' + Date.now(), time: newMealTime() }, true, blob);
+      if (settings.key) $('aiBtn').click(); // calculate straight away; add a comment and tap again to refine
     } catch (e) { alert(e.message); }
   };
   $('noPhotoBtn').onclick = () => openMeal({ id: 'm' + Date.now(), time: newMealTime() }, true, null);
@@ -563,6 +575,7 @@
     meal.note = $('mealNote').value.trim();
     meal.kcal = num($('mealKcal').value);
     meal.protein = num($('mealProt').value);
+    for (const f of MACROS) meal[f.key] = num($('meal' + f.el).value);
     meal.ai = $('aiOut').textContent || undefined;
     if (photoBlob) { await putPhoto(meal.id, photoBlob); meal.photo = meal.id; }
     const k = ymd(selected);
@@ -592,17 +605,25 @@
             name: { type: 'string' },
             portion: { type: 'string' },
             kcal: { type: 'integer' },
-            protein_g: { type: 'integer' }
+            protein_g: { type: 'integer' },
+            carbs_g: { type: 'integer' },
+            fat_g: { type: 'integer' },
+            fiber_g: { type: 'integer' },
+            sugar_g: { type: 'integer' }
           },
-          required: ['name', 'portion', 'kcal', 'protein_g'],
+          required: ['name', 'portion', 'kcal', 'protein_g', 'carbs_g', 'fat_g', 'fiber_g', 'sugar_g'],
           additionalProperties: false
         }
       },
       total_kcal: { type: 'integer' },
       total_protein_g: { type: 'integer' },
+      total_carbs_g: { type: 'integer' },
+      total_fat_g: { type: 'integer' },
+      total_fiber_g: { type: 'integer' },
+      total_sugar_g: { type: 'integer' },
       comment: { type: 'string' }
     },
-    required: ['items', 'total_kcal', 'total_protein_g', 'comment'],
+    required: ['items', 'total_kcal', 'total_protein_g', 'total_carbs_g', 'total_fat_g', 'total_fiber_g', 'total_sugar_g', 'comment'],
     additionalProperties: false
   };
 
@@ -620,10 +641,10 @@
       const content = [];
       if (blob) content.push({ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: await blobToBase64(blob) } });
       content.push({ type: 'text', text:
-        'Estimate the calories and protein of this meal for my food log.' +
+        'Estimate the calories and nutrition (protein, carbs, fat, fiber, sugar) of this meal for my food log.' +
         (note ? `\nMy note about the meal (trust it for amounts and ingredients): "${note}"` : '') +
         (blob ? '' : '\nThere is no photo, use only the note.') +
-        '\nList each food with a realistic portion. In "comment" give one short, friendly sentence (e.g. about protein). Be honest if something is hard to see.'
+        '\nList each food with a realistic portion. In "comment" give one short, friendly sentence (e.g. about protein or fiber). Be honest if something is hard to see.'
       });
       let response;
       try {
@@ -647,7 +668,9 @@
       const r = JSON.parse(text);
       $('mealKcal').value = r.total_kcal;
       $('mealProt').value = r.total_protein_g;
-      $('aiOut').textContent = r.items.map(i => `• ${i.name} (${i.portion}): ${i.kcal} kcal, ${i.protein_g} g protein`).join('\n') +
+      for (const f of MACROS) $('meal' + f.el).value = r[`total_${f.key}_g`];
+      $('aiOut').textContent = r.items.map(i =>
+        `• ${i.name} (${i.portion}): ${i.kcal} kcal · P ${i.protein_g} g · C ${i.carbs_g} g · F ${i.fat_g} g · fiber ${i.fiber_g} g`).join('\n') +
         (r.comment ? `\n${r.comment}` : '') + '\n(AI estimate – adjust if needed)';
       if (!$('mealNote').value.trim()) $('mealNote').value = r.items.map(i => i.name).join(', ');
     } catch (e) {
