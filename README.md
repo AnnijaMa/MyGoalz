@@ -17,10 +17,11 @@ Your data stays on your phone (local storage + IndexedDB for photos). Use **Expo
 
 ## Put it on your iPhone
 
-1. On GitHub, go to **Settings → Pages** and set **Source** to **GitHub Actions**.
-2. Re-run the "Deploy to GitHub Pages" workflow (Actions tab), or push any change.
-3. Open the Pages URL (e.g. `https://annijama.github.io/MyGoalz/`) in **Safari** on the iPhone.
-4. Tap **Share → Add to Home Screen**.
+The app is published with GitHub Pages from the `gh-pages` branch:
+**https://annijama.github.io/MyGoalz/**
+
+1. Open that link in **Safari** on the iPhone.
+2. Tap **Share → Add to Home Screen**.
 
 After that it opens full screen like a normal app and works offline.
 
