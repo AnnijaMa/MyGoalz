@@ -5,6 +5,8 @@ A personal iPhone web app for logging daily goals from **4 Nov to 25 Dec 2026**:
 - 💉 Ozempic injection, every Wednesday
 - 💊 Supplements, daily
 - 🥤 Protein shake, daily
+- 🏋️ Weight training with trainer, Tuesday & Thursday
+- 🧘 Pilates, Friday
 - 🏃 45 minutes of movement, daily (tap to tick it off, or log minutes in steps of ±5 / ±15)
 
 **Food log:** tap **📷 Take photo** (camera or photo library) or **✏️ Type it**, add a comment about what you ate,

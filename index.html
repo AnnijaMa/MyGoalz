@@ -119,6 +119,7 @@
   .cal .c.xmas { color: var(--red); }
   .cal .c .dot { position: absolute; top: 3px; right: 4px; width: 6px; height: 6px; border-radius: 50%; background: var(--red); }
   .cal .c.full .dot { background: #fff; }
+  .cal .c .mk { position: absolute; top: 1px; right: 2px; font-size: 9px; line-height: 1; }
   .cal .m { grid-column: 1 / -1; font-size: 13px; font-weight: 700; margin-top: 6px; }
   .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; font-size: 12px; color: var(--muted); }
   .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; }
@@ -231,6 +232,8 @@
       <div class="stat"><div class="n" id="stPerfect">0</div><div class="l">perfect days</div></div>
       <div class="stat"><div class="n" id="stStreak">0</div><div class="l">day streak 🔥</div></div>
       <div class="stat"><div class="n" id="stOz">0/8</div><div class="l">💉 Ozempic Wednesdays</div></div>
+      <div class="stat"><div class="n" id="stGym">0</div><div class="l">🏋️ training sessions</div></div>
+      <div class="stat"><div class="n" id="stPil">0</div><div class="l">🧘 Pilates classes</div></div>
       <div class="stat"><div class="n" id="stMove">0</div><div class="l">🏃 minutes moved</div></div>
       <div class="stat"><div class="n" id="stSupp">0</div><div class="l">💊 supplement days</div></div>
       <div class="stat"><div class="n" id="stShake">0</div><div class="l">🥤 protein shakes</div></div>
@@ -245,6 +248,7 @@
       <span><i style="background:var(--partial)"></i>partly</span>
       <span><i style="background:var(--card);border:1px solid var(--line)"></i>missed</span>
       <span><i style="background:var(--red);border-radius:50%"></i>injection day</span>
+      <span>🏋️ training · 🧘 Pilates</span>
     </div>
   </section>
 
@@ -315,7 +319,9 @@
   const WED = 3;
 
   const TASKS = [
-    { id: 'oz',    emoji: '💉', name: 'Ozempic injection', sub: 'Every Wednesday', wedOnly: true },
+    { id: 'oz',    emoji: '💉', name: 'Ozempic injection', sub: 'Every Wednesday', days: [3] },
+    { id: 'gym',   emoji: '🏋️', name: 'Weight training',   sub: 'With trainer · Tuesday & Thursday', days: [2, 4] },
+    { id: 'pil',   emoji: '🧘', name: 'Pilates',           sub: 'Every Friday', days: [5] },
     { id: 'supp',  emoji: '💊', name: 'Supplements',       sub: 'Daily' },
     { id: 'shake', emoji: '🥤', name: 'Protein shake',     sub: 'Daily' },
     { id: 'move',  emoji: '🏃', name: 'Move 45 minutes',   sub: 'Daily', minutes: true },
@@ -336,7 +342,7 @@
 
   let selected = clamp(startOfToday());
 
-  const tasksFor = d => TASKS.filter(t => !t.wedOnly || d.getDay() === WED);
+  const tasksFor = d => TASKS.filter(t => !t.days || t.days.includes(d.getDay()));
   const entry = d => data[ymd(d)] || {};
   const isDone = (d, t) => {
     const e = entry(d);
@@ -397,7 +403,8 @@
       }
     }
     const st = status(d);
-    $('dayDone').textContent = st.full ? (d.getDay() === WED ? 'Everything done – injection included! 🎉' : 'All goals done today! 🎉')
+    const special = { 2: 'training included! 💪', 3: 'injection included! 🎉', 4: 'training included! 💪', 5: 'Pilates included! 🧘' }[d.getDay()];
+    $('dayDone').textContent = st.full ? (special ? `Everything done – ${special}` : 'All goals done today! 🎉')
                                        : `${st.n} of ${st.total} done`;
   }
 
@@ -414,6 +421,10 @@
       mins += e.moveMin || (e.move ? MOVE_GOAL : 0);
     }
     for (const w of weds) if (entry(w).oz) ozDone++;
+    const gymDays = allDays.filter(d => d.getDay() === 2 || d.getDay() === 4);
+    const pilDays = allDays.filter(d => d.getDay() === 5);
+    $('stGym').textContent = `${gymDays.filter(d => entry(d).gym).length}/${gymDays.length}`;
+    $('stPil').textContent = `${pilDays.filter(d => entry(d).pil).length}/${pilDays.length}`;
 
     // streak: consecutive perfect days ending today (or yesterday if today not finished yet)
     let streak = 0;
@@ -457,7 +468,9 @@
       if (ymd(d) === ymd(selected)) cls += ' sel';
       if (ymd(d) === ymd(END)) cls += ' xmas';
       c.className = cls;
-      c.innerHTML = (ymd(d) === ymd(END) ? '🎄' : d.getDate()) + (d.getDay() === WED ? '<span class="dot"></span>' : '');
+      const mark = { 2: '🏋️', 3: '', 4: '🏋️', 5: '🧘' }[d.getDay()];
+      c.innerHTML = (ymd(d) === ymd(END) ? '🎄' : d.getDate()) + (d.getDay() === WED ? '<span class="dot"></span>' : '') +
+        (mark ? `<span class="mk">${mark}</span>` : '');
       c.onclick = () => { selected = d; render(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
       cal.appendChild(c);
     }
