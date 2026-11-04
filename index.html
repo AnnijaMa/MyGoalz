@@ -129,6 +129,55 @@
     border-radius: 12px; padding: 10px; font: inherit; font-weight: 600; cursor: pointer;
   }
   .hint { color: var(--muted); font-size: 12px; margin-top: 8px; }
+
+  /* Food log */
+  .foodhead h2 { white-space: nowrap; }
+  .foodhead { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .totals { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; text-align: right; }
+  .totals b { color: var(--ink); font-size: 16px; }
+  .addmeal { display: flex; gap: 10px; margin-top: 12px; }
+  .addmeal button, .addmeal label {
+    flex: 1; display: flex; align-items: center; justify-content: center; white-space: nowrap;
+    border: 0; border-radius: 12px; padding: 12px; font: inherit; font-weight: 700; cursor: pointer;
+    background: var(--green); color: #fff;
+  }
+  .addmeal .alt { background: var(--bg); color: var(--ink); }
+  .meals { display: grid; gap: 8px; margin-top: 12px; }
+  .meal { display: flex; gap: 12px; align-items: center; padding: 8px; border-radius: 12px; background: var(--bg); cursor: pointer; }
+  .meal .ph { width: 56px; height: 56px; border-radius: 10px; object-fit: cover; flex: none; background: var(--future); display: grid; place-items: center; font-size: 24px; }
+  .meal .mt { flex: 1; min-width: 0; }
+  .meal .mt .note { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .meal .mt .sub { color: var(--muted); font-size: 13px; }
+  .empty-note { color: var(--muted); font-size: 14px; margin-top: 10px; }
+
+  .sheet-bg { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: none; z-index: 10; }
+  .sheet-bg.show { display: block; }
+  .sheet {
+    position: fixed; left: 0; right: 0; bottom: 0; max-width: 520px; margin: 0 auto; z-index: 11;
+    background: var(--card); border-radius: 22px 22px 0 0; padding: 16px 16px calc(env(safe-area-inset-bottom) + 16px);
+    max-height: 92vh; overflow-y: auto; transform: translateY(105%); transition: transform .25s ease;
+    -webkit-user-select: text; user-select: text;
+  }
+  .sheet.show { transform: none; }
+  .sheet h3 { margin: 0 0 10px; font-size: 18px; }
+  .sheet img.big { width: 100%; max-height: 300px; object-fit: cover; border-radius: 14px; display: block; }
+  .sheet textarea, .sheet input[type=number], .sheet input[type=password], .sheet input[type=text] {
+    width: 100%; font: inherit; font-size: 16px; color: var(--ink); background: var(--bg);
+    border: 2px solid var(--line); border-radius: 12px; padding: 10px; margin-top: 6px;
+  }
+  .sheet textarea { min-height: 70px; resize: vertical; }
+  .sheet .lbl { font-size: 13px; color: var(--muted); font-weight: 600; margin-top: 12px; display: block; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .btn { border: 0; border-radius: 12px; padding: 12px; font: inherit; font-weight: 700; cursor: pointer; background: var(--bg); color: var(--ink); }
+  .btn.primary { background: var(--green); color: #fff; }
+  .btn.ai { background: #5b4bc4; color: #fff; width: 100%; margin-top: 12px; }
+  .btn.ai:disabled { opacity: .6; }
+  .btn.danger { color: var(--red); background: transparent; }
+  .sheet .actions { display: flex; gap: 10px; margin-top: 16px; }
+  .sheet .actions .btn { flex: 1; }
+  .aiout { font-size: 13px; color: var(--muted); margin-top: 8px; white-space: pre-line; }
+  .settings-row { display: flex; gap: 10px; margin-top: 10px; }
+  .settings-row .btn { flex: 1; border: 2px solid var(--line); background: transparent; }
   .install { display: none; }
   .install.show { display: block; }
   footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 20px; }
@@ -156,6 +205,18 @@
     </div>
     <div class="tasks" id="tasks"></div>
     <div class="daydone" id="dayDone"></div>
+  </section>
+
+  <section class="card">
+    <div class="foodhead">
+      <h2>Food</h2>
+      <div class="totals" id="foodTotals"></div>
+    </div>
+    <div class="addmeal">
+      <label>📷 Take photo<input type="file" id="photoInput" accept="image/*" hidden></label>
+      <button class="alt" id="noPhotoBtn">✏️ Type it</button>
+    </div>
+    <div class="meals" id="meals"></div>
   </section>
 
   <section class="card">
@@ -188,8 +249,46 @@
       <button id="exportBtn">Export</button>
       <label>Import<input type="file" id="importFile" accept="application/json,.json" hidden></label>
     </div>
-    <div class="hint">Your log is stored only on this iPhone. Export now and then to keep a copy (e.g. in Files or iCloud Drive).</div>
+    <div class="hint">Your log and food photos are stored only on this iPhone. Export now and then to keep a copy (e.g. in Files or iCloud Drive).</div>
+    <div class="settings-row"><button class="btn" id="settingsBtn">⚙️ Food targets &amp; AI</button></div>
   </section>
+
+  <div class="sheet-bg" id="sheetBg"></div>
+
+  <!-- Meal editor -->
+  <div class="sheet" id="mealSheet" role="dialog" aria-label="Meal">
+    <h3 id="mealTitle">Meal</h3>
+    <img class="big" id="mealImg" alt="" hidden>
+    <label class="lbl" for="mealNote">What did you eat?</label>
+    <textarea id="mealNote" placeholder="e.g. 2 eggs, toast with butter, coffee with milk"></textarea>
+    <button class="btn ai" id="aiBtn">✨ Calculate with AI</button>
+    <div class="aiout" id="aiOut"></div>
+    <div class="row2">
+      <div><label class="lbl" for="mealKcal">Calories (kcal)</label><input type="number" inputmode="numeric" id="mealKcal" min="0"></div>
+      <div><label class="lbl" for="mealProt">Protein (g)</label><input type="number" inputmode="decimal" id="mealProt" min="0"></div>
+    </div>
+    <div class="actions">
+      <button class="btn danger" id="mealDelete">Delete</button>
+      <button class="btn" id="mealCancel">Cancel</button>
+      <button class="btn primary" id="mealSave">Save</button>
+    </div>
+  </div>
+
+  <!-- Settings -->
+  <div class="sheet" id="setSheet" role="dialog" aria-label="Settings">
+    <h3>Food targets &amp; AI</h3>
+    <div class="row2">
+      <div><label class="lbl" for="setKcal">Daily calories target</label><input type="number" inputmode="numeric" id="setKcal" placeholder="optional"></div>
+      <div><label class="lbl" for="setProt">Daily protein target (g)</label><input type="number" inputmode="numeric" id="setProt" placeholder="optional"></div>
+    </div>
+    <label class="lbl" for="setKey">Claude API key (for “Calculate with AI”)</label>
+    <input type="password" id="setKey" placeholder="sk-ant-…" autocomplete="off" autocapitalize="off" spellcheck="false">
+    <div class="hint">Optional. Create a key at console.anthropic.com. It is saved only on this iPhone and sent only to Anthropic when you tap “Calculate with AI”. Each estimate costs roughly 1–3 cents. Without a key you can still type calories yourself.</div>
+    <div class="actions">
+      <button class="btn" id="setCancel">Cancel</button>
+      <button class="btn primary" id="setSave">Save</button>
+    </div>
+  </div>
 
   <footer>4 Nov → 25 Dec 2026 · you've got this 💪</footer>
 
@@ -350,14 +449,238 @@
     }
   }
 
-  function render() { renderDay(); renderStats(); renderCal(); }
+  // ---------- Food log ----------
+  const SKEY = 'mygoalz-settings';
+  let settings = {};
+  try { settings = JSON.parse(localStorage.getItem(SKEY)) || {}; } catch { settings = {}; }
+  const saveSettings = () => { try { localStorage.setItem(SKEY, JSON.stringify(settings)); } catch {} };
+
+  // Photos live in IndexedDB (localStorage is too small for images).
+  const idb = new Promise((resolve, reject) => {
+    const req = indexedDB.open('mygoalz', 1);
+    req.onupgradeneeded = () => req.result.createObjectStore('photos');
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+  const photoOp = (mode, fn) => idb.then(db => new Promise((res, rej) => {
+    const tx = db.transaction('photos', mode); const r = fn(tx.objectStore('photos'));
+    tx.oncomplete = () => res(r && r.result); tx.onerror = () => rej(tx.error);
+  }));
+  const putPhoto = (id, blob) => photoOp('readwrite', s => s.put(blob, id));
+  const getPhoto = id => photoOp('readonly', s => s.get(id));
+  const delPhoto = id => photoOp('readwrite', s => s.delete(id));
+  const allPhotoKeys = () => photoOp('readonly', s => s.getAllKeys());
+
+  const urlCache = new Map();
+  async function photoURL(id) {
+    if (urlCache.has(id)) return urlCache.get(id);
+    const b = await getPhoto(id); if (!b) return null;
+    const u = URL.createObjectURL(b); urlCache.set(id, u); return u;
+  }
+
+  // Shrink camera photos to max 1280px JPEG to save space (and AI cost).
+  function compressImage(file, max = 1280) {
+    return new Promise((resolve, reject) => {
+      const img = new Image(); const u = URL.createObjectURL(file);
+      img.onload = () => {
+        const s = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+        const c = document.createElement('canvas');
+        c.width = Math.round(img.naturalWidth * s); c.height = Math.round(img.naturalHeight * s);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(u);
+        c.toBlob(b => b ? resolve(b) : reject(new Error('compress failed')), 'image/jpeg', 0.82);
+      };
+      img.onerror = () => { URL.revokeObjectURL(u); reject(new Error('Could not read this photo')); };
+      img.src = u;
+    });
+  }
+  const blobToBase64 = b => new Promise(r => { const fr = new FileReader(); fr.onload = () => r(fr.result.split(',')[1]); fr.readAsDataURL(b); });
+
+  const mealsOf = d => (data[ymd(d)] && data[ymd(d)].meals) || [];
+  const num = v => (v === '' || v == null || isNaN(Number(v))) ? null : Math.round(Number(v));
+
+  async function renderFood() {
+    const meals = mealsOf(selected);
+    const kcal = meals.reduce((a, m) => a + (m.kcal || 0), 0);
+    const prot = meals.reduce((a, m) => a + (m.protein || 0), 0);
+    $('foodTotals').innerHTML =
+      `<b>${kcal}</b>${settings.kcal ? ' / ' + settings.kcal : ''} kcal<br><b>${prot}</b>${settings.prot ? ' / ' + settings.prot : ''} g protein`;
+    const list = $('meals'); list.innerHTML = '';
+    if (!meals.length) { list.innerHTML = '<div class="empty-note">No meals logged for this day yet.</div>'; return; }
+    for (const m of [...meals].sort((a, b) => a.time.localeCompare(b.time))) {
+      const row = document.createElement('div'); row.className = 'meal';
+      const t = new Date(m.time).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+      const bits = [t, m.kcal != null ? `${m.kcal} kcal` : null, m.protein != null ? `${m.protein} g protein` : null].filter(Boolean);
+      row.innerHTML = `<div class="ph">🍽️</div><div class="mt"><div class="note"></div><div class="sub">${bits.join(' · ')}</div></div>`;
+      row.querySelector('.note').textContent = m.note || 'Meal';
+      if (m.photo) photoURL(m.photo).then(u => {
+        if (!u) return; const im = document.createElement('img'); im.className = 'ph'; im.src = u; im.alt = '';
+        row.querySelector('.ph').replaceWith(im);
+      });
+      row.onclick = () => openMeal(m);
+      list.appendChild(row);
+    }
+  }
+
+  // Meal editor sheet
+  let editing = null; // { meal, isNew, photoBlob }
+  const openSheet = id => { $('sheetBg').classList.add('show'); $(id).classList.add('show'); };
+  const closeSheets = () => { $('sheetBg').classList.remove('show'); document.querySelectorAll('.sheet').forEach(s => s.classList.remove('show')); };
+  $('sheetBg').onclick = closeSheets;
+
+  async function openMeal(meal, isNew = false, photoBlob = null) {
+    editing = { meal, isNew, photoBlob };
+    $('mealTitle').textContent = isNew ? 'New meal' : 'Edit meal';
+    $('mealNote').value = meal.note || '';
+    $('mealKcal').value = meal.kcal ?? '';
+    $('mealProt').value = meal.protein ?? '';
+    $('aiOut').textContent = meal.ai || '';
+    $('mealDelete').style.display = isNew ? 'none' : '';
+    const img = $('mealImg');
+    const u = photoBlob ? URL.createObjectURL(photoBlob) : meal.photo ? await photoURL(meal.photo) : null;
+    img.hidden = !u; if (u) img.src = u;
+    openSheet('mealSheet');
+  }
+
+  function newMealTime() {
+    // Use the current time on the selected day.
+    const n = new Date();
+    return new Date(selected.getFullYear(), selected.getMonth(), selected.getDate(), n.getHours(), n.getMinutes()).toISOString();
+  }
+
+  $('photoInput').onchange = async ev => {
+    const f = ev.target.files[0]; ev.target.value = ''; if (!f) return;
+    try {
+      const blob = await compressImage(f);
+      openMeal({ id: 'm' + Date.now(), time: newMealTime() }, true, blob);
+    } catch (e) { alert(e.message); }
+  };
+  $('noPhotoBtn').onclick = () => openMeal({ id: 'm' + Date.now(), time: newMealTime() }, true, null);
+  $('mealCancel').onclick = closeSheets;
+
+  $('mealSave').onclick = async () => {
+    const { meal, isNew, photoBlob } = editing;
+    meal.note = $('mealNote').value.trim();
+    meal.kcal = num($('mealKcal').value);
+    meal.protein = num($('mealProt').value);
+    meal.ai = $('aiOut').textContent || undefined;
+    if (photoBlob) { await putPhoto(meal.id, photoBlob); meal.photo = meal.id; }
+    const k = ymd(selected);
+    data[k] = Object.assign({}, data[k]);
+    const meals = (data[k].meals || []).filter(m => m.id !== meal.id);
+    meals.push(meal); data[k].meals = meals;
+    save(); closeSheets(); render();
+  };
+  $('mealDelete').onclick = async () => {
+    if (!confirm('Delete this meal?')) return;
+    const { meal } = editing; const k = ymd(selected);
+    data[k].meals = (data[k].meals || []).filter(m => m.id !== meal.id);
+    if (meal.photo) { await delPhoto(meal.photo); urlCache.delete(meal.photo); }
+    save(); closeSheets(); render();
+  };
+
+  // ---------- AI estimate (Claude API, your own key) ----------
+  const SDK_URL = './vendor/anthropic-sdk-0.137.0.js'; // official Anthropic TypeScript SDK, bundled
+  const NUTRITION_SCHEMA = {
+    type: 'object',
+    properties: {
+      items: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            name: { type: 'string' },
+            portion: { type: 'string' },
+            kcal: { type: 'integer' },
+            protein_g: { type: 'integer' }
+          },
+          required: ['name', 'portion', 'kcal', 'protein_g'],
+          additionalProperties: false
+        }
+      },
+      total_kcal: { type: 'integer' },
+      total_protein_g: { type: 'integer' },
+      comment: { type: 'string' }
+    },
+    required: ['items', 'total_kcal', 'total_protein_g', 'comment'],
+    additionalProperties: false
+  };
+
+  $('aiBtn').onclick = async () => {
+    if (!settings.key) { alert('Add your Claude API key first (Backup → Food targets & AI).'); closeSheets(); openSettings(); return; }
+    const note = $('mealNote').value.trim();
+    const { meal, photoBlob } = editing;
+    const blob = photoBlob || (meal.photo ? await getPhoto(meal.photo) : null);
+    if (!blob && !note) { alert('Add a photo or describe what you ate first.'); return; }
+
+    const btn = $('aiBtn'); btn.disabled = true; btn.textContent = '✨ Calculating…';
+    try {
+      const { default: Anthropic } = await import(SDK_URL);
+      const client = new Anthropic({ apiKey: settings.key, dangerouslyAllowBrowser: true });
+      const content = [];
+      if (blob) content.push({ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: await blobToBase64(blob) } });
+      content.push({ type: 'text', text:
+        'Estimate the calories and protein of this meal for my food log.' +
+        (note ? `\nMy note about the meal (trust it for amounts and ingredients): "${note}"` : '') +
+        (blob ? '' : '\nThere is no photo, use only the note.') +
+        '\nList each food with a realistic portion. In "comment" give one short, friendly sentence (e.g. about protein). Be honest if something is hard to see.'
+      });
+      let response;
+      try {
+        response = await client.beta.messages.create({
+          model: 'claude-opus-5-5',
+          max_tokens: 16000,
+          betas: ['server-side-fallback-2026-07-01'],
+          fallbacks: 'default',
+          output_config: { format: { type: 'json_schema', schema: NUTRITION_SCHEMA } },
+          messages: [{ role: 'user', content }]
+        });
+      } catch (e) {
+        if (e instanceof Anthropic.AuthenticationError) throw new Error('Your API key was not accepted. Please check it in settings.');
+        if (e instanceof Anthropic.RateLimitError) throw new Error('Too many requests right now – try again in a minute.');
+        if (e instanceof Anthropic.APIConnectionError) throw new Error('No connection to Claude. Are you online?');
+        if (e instanceof Anthropic.APIError) throw new Error(`Claude API error (${e.status}): ${e.message}`);
+        throw e;
+      }
+      if (response.stop_reason === 'refusal') throw new Error('Claude could not estimate this one – please enter the numbers yourself.');
+      const text = response.content.filter(b => b.type === 'text').map(b => b.text).join('');
+      const r = JSON.parse(text);
+      $('mealKcal').value = r.total_kcal;
+      $('mealProt').value = r.total_protein_g;
+      $('aiOut').textContent = r.items.map(i => `• ${i.name} (${i.portion}): ${i.kcal} kcal, ${i.protein_g} g protein`).join('\n') +
+        (r.comment ? `\n${r.comment}` : '') + '\n(AI estimate – adjust if needed)';
+      if (!$('mealNote').value.trim()) $('mealNote').value = r.items.map(i => i.name).join(', ');
+    } catch (e) {
+      alert(e.message || 'Something went wrong.');
+    } finally {
+      btn.disabled = false; btn.textContent = '✨ Calculate with AI';
+    }
+  };
+
+  // Settings sheet
+  function openSettings() {
+    $('setKcal').value = settings.kcal || ''; $('setProt').value = settings.prot || ''; $('setKey').value = settings.key || '';
+    openSheet('setSheet');
+  }
+  $('settingsBtn').onclick = openSettings;
+  $('setCancel').onclick = closeSheets;
+  $('setSave').onclick = () => {
+    settings.kcal = num($('setKcal').value) || undefined;
+    settings.prot = num($('setProt').value) || undefined;
+    settings.key = $('setKey').value.trim() || undefined;
+    saveSettings(); closeSheets(); render();
+  };
+
+  function render() { renderDay(); renderFood(); renderStats(); renderCal(); }
 
   $('prev').onclick = () => { selected = clamp(addDays(selected, -1)); render(); };
   $('next').onclick = () => { selected = clamp(addDays(selected, 1)); render(); };
 
   // Backup
   $('exportBtn').onclick = async () => {
-    const json = JSON.stringify({ app: 'mygoalz', version: 1, exported: new Date().toISOString(), data }, null, 2);
+    const photos = {};
+    for (const k of await allPhotoKeys()) photos[k] = await blobToBase64(await getPhoto(k));
+    const json = JSON.stringify({ app: 'mygoalz', version: 2, exported: new Date().toISOString(), data, photos });
     const name = `mygoalz-backup-${ymd(new Date())}.json`;
     const file = new File([json], name, { type: 'application/json' });
     try {
@@ -374,6 +697,11 @@
       const incoming = parsed.data || parsed;
       if (typeof incoming !== 'object') throw new Error('bad file');
       if (!confirm('Replace the current log with this backup?')) return;
+      for (const [k, b64] of Object.entries(parsed.photos || {})) {
+        const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+        await putPhoto(k, new Blob([bytes], { type: 'image/jpeg' }));
+        urlCache.delete(k);
+      }
       data = incoming; save(); render();
     } catch { alert('That file does not look like a MyGoalz backup.'); }
     ev.target.value = '';
