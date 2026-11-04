@@ -324,7 +324,7 @@
     { id: 'pil',   emoji: '🧘', name: 'Pilates',           sub: 'Every Friday', days: [5] },
     { id: 'supp',  emoji: '💊', name: 'Supplements',       sub: 'Daily' },
     { id: 'shake', emoji: '🥤', name: 'Protein shake',     sub: 'Daily' },
-    { id: 'move',  emoji: '🏃', name: 'Move 45 minutes',   sub: 'Daily', minutes: true },
+    { id: 'move',  emoji: '🏃', name: 'Move 45 minutes',   sub: 'Days without training', minutes: true, days: [0, 1, 3, 6] },
   ];
 
   const $ = id => document.getElementById(id);
