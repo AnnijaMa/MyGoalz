@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MyGoalz</title>
+<meta name="description" content="Daily goal log until Christmas">
+<meta name="theme-color" content="#0f3d2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MyGoalz">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<style>
+  :root {
+    --bg: #f4f1ea;
+    --card: #ffffff;
+    --ink: #1d2420;
+    --muted: #6b736e;
+    --line: #e4dfd4;
+    --green: #1f7a55;
+    --green-soft: #d8efe3;
+    --red: #b8323a;
+    --red-soft: #f7dcdc;
+    --gold: #c9962b;
+    --partial: #f1e2b8;
+    --future: #ece8df;
+    --radius: 18px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0e1412;
+      --card: #18201d;
+      --ink: #eef2ef;
+      --muted: #94a19a;
+      --line: #26302c;
+      --green: #3bb27f;
+      --green-soft: #173a2b;
+      --red: #e0606a;
+      --red-soft: #3d1d20;
+      --gold: #e2b34f;
+      --partial: #4a3f1f;
+      --future: #1f2825;
+    }
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); }
+  body {
+    font: 16px/1.4 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+    padding: env(safe-area-inset-top) 16px calc(env(safe-area-inset-bottom) + 24px);
+    max-width: 520px; margin: 0 auto;
+    -webkit-user-select: none; user-select: none;
+  }
+  header { padding: 18px 2px 8px; display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+  h1 { font-size: 30px; margin: 0; letter-spacing: -0.02em; }
+  .countdown { text-align: right; color: var(--muted); font-size: 14px; }
+  .countdown b { display: block; color: var(--red); font-size: 26px; line-height: 1; }
+
+  .card { background: var(--card); border-radius: var(--radius); padding: 16px; margin-top: 14px; box-shadow: 0 1px 2px rgba(0,0,0,.05); }
+
+  .daynav { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .daynav button { width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--bg); color: var(--ink); font-size: 22px; cursor: pointer; }
+  .daynav button:disabled { opacity: .25; }
+  .daytitle { text-align: center; flex: 1; }
+  .daytitle .d { font-weight: 700; font-size: 19px; }
+  .daytitle .s { color: var(--muted); font-size: 13px; }
+  .todaylink { color: var(--green); font-weight: 600; cursor: pointer; }
+
+  .tasks { margin-top: 12px; display: grid; gap: 10px; }
+  .task {
+    display: flex; align-items: center; gap: 14px; width: 100%;
+    padding: 14px; border-radius: 14px; border: 2px solid var(--line);
+    background: transparent; color: var(--ink); font: inherit; text-align: left; cursor: pointer;
+    transition: background .15s, border-color .15s, transform .08s;
+  }
+  .task:active { transform: scale(.98); }
+  .task .emoji { font-size: 28px; width: 36px; text-align: center; }
+  .task .txt { flex: 1; }
+  .task .txt b { display: block; font-size: 17px; }
+  .task .txt span { color: var(--muted); font-size: 13px; }
+  .task .check {
+    width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--line);
+    display: grid; place-items: center; color: #fff; font-size: 17px; font-weight: 800; flex: none;
+  }
+  .task.done { background: var(--green-soft); border-color: var(--green); }
+  .task.done .check { background: var(--green); border-color: var(--green); }
+  .task.oz.done { background: var(--red-soft); border-color: var(--red); }
+  .task.oz.done .check { background: var(--red); border-color: var(--red); }
+
+  .movebar { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+  .movebar button { flex: none; border: 0; border-radius: 10px; padding: 8px 12px; font: inherit; font-weight: 600; background: var(--bg); color: var(--ink); cursor: pointer; }
+  .movebar .mins { flex: 1; text-align: center; font-variant-numeric: tabular-nums; color: var(--muted); font-size: 14px; }
+  .movebar .mins b { color: var(--ink); font-size: 17px; }
+
+  .daydone { margin-top: 12px; text-align: center; font-weight: 700; color: var(--green); min-height: 22px; }
+
+  .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .stat { background: var(--bg); border-radius: 12px; padding: 10px 12px; }
+  .stat .n { font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .stat .l { color: var(--muted); font-size: 12px; }
+  .progress { height: 10px; background: var(--future); border-radius: 99px; overflow: hidden; margin: 10px 0 14px; }
+  .progress > div { height: 100%; background: var(--green); border-radius: 99px; transition: width .3s; }
+  h2 { font-size: 15px; margin: 0; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+
+  .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 10px; }
+  .cal .hd { text-align: center; font-size: 11px; color: var(--muted); font-weight: 600; padding-bottom: 2px; }
+  .cal .c {
+    aspect-ratio: 1; border-radius: 10px; display: grid; place-items: center; position: relative;
+    font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; cursor: pointer; border: 2px solid transparent;
+    background: var(--future); color: var(--muted);
+  }
+  .cal .c.empty { background: transparent; cursor: default; }
+  .cal .c.full { background: var(--green); color: #fff; }
+  .cal .c.part { background: var(--partial); color: var(--ink); }
+  .cal .c.miss { background: var(--card); color: var(--muted); border-color: var(--line); }
+  .cal .c.sel { border-color: var(--ink); }
+  .cal .c.xmas { color: var(--red); }
+  .cal .c .dot { position: absolute; top: 3px; right: 4px; width: 6px; height: 6px; border-radius: 50%; background: var(--red); }
+  .cal .c.full .dot { background: #fff; }
+  .cal .m { grid-column: 1 / -1; font-size: 13px; font-weight: 700; margin-top: 6px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; font-size: 12px; color: var(--muted); }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; }
+
+  .backup { display: flex; gap: 10px; }
+  .backup button, .backup label {
+    flex: 1; text-align: center; border: 2px solid var(--line); background: transparent; color: var(--ink);
+    border-radius: 12px; padding: 10px; font: inherit; font-weight: 600; cursor: pointer;
+  }
+  .hint { color: var(--muted); font-size: 12px; margin-top: 8px; }
+  .install { display: none; }
+  .install.show { display: block; }
+  footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 20px; }
+</style>
+</head>
+<body>
+  <header>
+    <h1>MyGoalz</h1>
+    <div class="countdown"><b id="daysLeft">–</b><span id="daysLeftLabel">days to Christmas 🎄</span></div>
+  </header>
+
+  <section class="card install" id="installCard">
+    <b>Add to your Home Screen</b>
+    <div class="hint" style="margin-top:4px">In Safari tap the Share button <span aria-hidden="true">⎋</span>, then <b>“Add to Home Screen”</b>. MyGoalz then opens like a normal app and works offline.</div>
+  </section>
+
+  <section class="card">
+    <div class="daynav">
+      <button id="prev" aria-label="Previous day">‹</button>
+      <div class="daytitle">
+        <div class="d" id="dayTitle"></div>
+        <div class="s" id="daySub"></div>
+      </div>
+      <button id="next" aria-label="Next day">›</button>
+    </div>
+    <div class="tasks" id="tasks"></div>
+    <div class="daydone" id="dayDone"></div>
+  </section>
+
+  <section class="card">
+    <h2>Progress</h2>
+    <div class="progress"><div id="progBar" style="width:0"></div></div>
+    <div class="stats">
+      <div class="stat"><div class="n" id="stPerfect">0</div><div class="l">perfect days</div></div>
+      <div class="stat"><div class="n" id="stStreak">0</div><div class="l">day streak 🔥</div></div>
+      <div class="stat"><div class="n" id="stOz">0/8</div><div class="l">💉 Ozempic Wednesdays</div></div>
+      <div class="stat"><div class="n" id="stMove">0</div><div class="l">🏃 minutes moved</div></div>
+      <div class="stat"><div class="n" id="stSupp">0</div><div class="l">💊 supplement days</div></div>
+      <div class="stat"><div class="n" id="stShake">0</div><div class="l">🥤 protein shakes</div></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Calendar</h2>
+    <div class="cal" id="cal"></div>
+    <div class="legend">
+      <span><i style="background:var(--green)"></i>all done</span>
+      <span><i style="background:var(--partial)"></i>partly</span>
+      <span><i style="background:var(--card);border:1px solid var(--line)"></i>missed</span>
+      <span><i style="background:var(--red);border-radius:50%"></i>injection day</span>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Backup</h2>
+    <div class="backup" style="margin-top:10px">
+      <button id="exportBtn">Export</button>
+      <label>Import<input type="file" id="importFile" accept="application/json,.json" hidden></label>
+    </div>
+    <div class="hint">Your log is stored only on this iPhone. Export now and then to keep a copy (e.g. in Files or iCloud Drive).</div>
+  </section>
+
+  <footer>4 Nov → 25 Dec 2026 · you've got this 💪</footer>
+
+<script>
+(() => {
+  const START = new Date(2026, 10, 4);   // 4 Nov 2026 (months are 0-based)
+  const END   = new Date(2026, 11, 25);  // 25 Dec 2026
+  const MOVE_GOAL = 45;
+  const KEY = 'mygoalz-v1';
+  const WED = 3;
+
+  const TASKS = [
+    { id: 'oz',    emoji: '💉', name: 'Ozempic injection', sub: 'Every Wednesday', wedOnly: true },
+    { id: 'supp',  emoji: '💊', name: 'Supplements',       sub: 'Daily' },
+    { id: 'shake', emoji: '🥤', name: 'Protein shake',     sub: 'Daily' },
+    { id: 'move',  emoji: '🏃', name: 'Move 45 minutes',   sub: 'Daily', minutes: true },
+  ];
+
+  const $ = id => document.getElementById(id);
+  const ymd = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const addDays = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+  const startOfToday = () => { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate()); };
+  const clamp = (d) => d < START ? START : d > END ? END : d;
+
+  let data = {};
+  try { data = JSON.parse(localStorage.getItem(KEY)) || {}; } catch { data = {}; }
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch {} };
+
+  const allDays = [];
+  for (let d = START; d <= END; d = addDays(d, 1)) allDays.push(d);
+
+  let selected = clamp(startOfToday());
+
+  const tasksFor = d => TASKS.filter(t => !t.wedOnly || d.getDay() === WED);
+  const entry = d => data[ymd(d)] || {};
+  const isDone = (d, t) => {
+    const e = entry(d);
+    return t.minutes ? (e.moveMin || 0) >= MOVE_GOAL || !!e.move : !!e[t.id];
+  };
+  const status = d => {
+    const ts = tasksFor(d);
+    const n = ts.filter(t => isDone(d, t)).length;
+    return { n, total: ts.length, full: n === ts.length, any: n > 0 };
+  };
+
+  function setField(d, patch) {
+    const k = ymd(d);
+    data[k] = Object.assign({}, data[k], patch);
+    save(); render();
+  }
+
+  function renderDay() {
+    const d = selected, today = startOfToday();
+    const fmt = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+    $('dayTitle').textContent = ymd(d) === ymd(today) ? 'Today' : fmt;
+    const dayNo = Math.round((d - START) / 864e5) + 1;
+    $('daySub').innerHTML = (ymd(d) === ymd(today) ? fmt + ' · ' : '') + `Day ${dayNo} of ${allDays.length}` +
+      (ymd(d) !== ymd(clamp(today)) ? ` · <span class="todaylink" id="goToday">back to today</span>` : '');
+    const gt = $('goToday'); if (gt) gt.onclick = () => { selected = clamp(startOfToday()); render(); };
+    $('prev').disabled = d <= START;
+    $('next').disabled = d >= END;
+
+    const wrap = $('tasks'); wrap.innerHTML = '';
+    const e = entry(d);
+    for (const t of tasksFor(d)) {
+      const done = isDone(d, t);
+      const btn = document.createElement('button');
+      btn.className = 'task' + (done ? ' done' : '') + (t.id === 'oz' ? ' oz' : '');
+      btn.innerHTML = `<span class="emoji">${t.emoji}</span><span class="txt"><b>${t.name}</b><span>${t.sub}</span></span><span class="check">${done ? '✓' : ''}</span>`;
+      btn.onclick = () => {
+        if (t.minutes) {
+          // toggle: mark full 45 min, or clear
+          setField(d, done ? { move: false, moveMin: 0 } : { move: true, moveMin: Math.max(e.moveMin || 0, MOVE_GOAL) });
+        } else {
+          setField(d, { [t.id]: !done });
+        }
+      };
+      wrap.appendChild(btn);
+
+      if (t.minutes) {
+        const mins = e.moveMin || (e.move ? MOVE_GOAL : 0);
+        const bar = document.createElement('div');
+        bar.className = 'movebar';
+        bar.innerHTML = `<button data-d="-15">−15</button><button data-d="-5">−5</button>
+          <div class="mins"><b>${mins}</b> / ${MOVE_GOAL} min</div>
+          <button data-d="5">+5</button><button data-d="15">+15</button>`;
+        bar.querySelectorAll('button').forEach(b => b.onclick = () => {
+          const v = Math.max(0, Math.min(600, mins + Number(b.dataset.d)));
+          setField(d, { moveMin: v, move: v >= MOVE_GOAL });
+        });
+        wrap.appendChild(bar);
+      }
+    }
+    const st = status(d);
+    $('dayDone').textContent = st.full ? (d.getDay() === WED ? 'Everything done – injection included! 🎉' : 'All goals done today! 🎉')
+                                       : `${st.n} of ${st.total} done`;
+  }
+
+  function renderStats() {
+    const today = startOfToday();
+    const past = allDays.filter(d => d <= today);
+    let perfect = 0, supp = 0, shake = 0, mins = 0, ozDone = 0;
+    const weds = allDays.filter(d => d.getDay() === WED);
+    for (const d of allDays) {
+      const e = entry(d);
+      if (status(d).full && (e.supp || e.shake || e.move || e.moveMin)) perfect++;
+      if (e.supp) supp++;
+      if (e.shake) shake++;
+      mins += e.moveMin || (e.move ? MOVE_GOAL : 0);
+    }
+    for (const w of weds) if (entry(w).oz) ozDone++;
+
+    // streak: consecutive perfect days ending today (or yesterday if today not finished yet)
+    let streak = 0;
+    let d = today > END ? END : today;
+    if (!status(d).full) d = addDays(d, -1);
+    while (d >= START && status(d).full) { streak++; d = addDays(d, -1); }
+
+    $('stPerfect').textContent = `${perfect}/${allDays.length}`;
+    $('stStreak').textContent = streak;
+    $('stOz').textContent = `${ozDone}/${weds.length}`;
+    $('stMove').textContent = mins;
+    $('stSupp').textContent = supp;
+    $('stShake').textContent = shake;
+    $('progBar').style.width = (perfect / allDays.length * 100) + '%';
+
+    const left = Math.round((END - today) / 864e5);
+    $('daysLeft').textContent = left > 0 ? left : '🎄';
+    $('daysLeftLabel').textContent = left > 0 ? (left === 1 ? 'day to Christmas 🎄' : 'days to Christmas 🎄') : 'Merry Christmas!';
+  }
+
+  function renderCal() {
+    const cal = $('cal'); cal.innerHTML = '';
+    ['Mo','Tu','We','Th','Fr','Sa','Su'].forEach(h => { const el = document.createElement('div'); el.className = 'hd'; el.textContent = h; cal.appendChild(el); });
+    const today = startOfToday();
+    let month = -1;
+    for (const d of allDays) {
+      if (d.getMonth() !== month) {
+        month = d.getMonth();
+        const m = document.createElement('div'); m.className = 'm';
+        m.textContent = d.toLocaleDateString('en-GB', { month: 'long' });
+        cal.appendChild(m);
+        const pad = (d.getDay() + 6) % 7;
+        for (let i = 0; i < pad; i++) { const e = document.createElement('div'); e.className = 'c empty'; cal.appendChild(e); }
+      }
+      const st = status(d);
+      const c = document.createElement('div');
+      let cls = 'c';
+      if (st.full) cls += ' full';
+      else if (st.any) cls += ' part';
+      else if (d < today) cls += ' miss';
+      if (ymd(d) === ymd(selected)) cls += ' sel';
+      if (ymd(d) === ymd(END)) cls += ' xmas';
+      c.className = cls;
+      c.innerHTML = (ymd(d) === ymd(END) ? '🎄' : d.getDate()) + (d.getDay() === WED ? '<span class="dot"></span>' : '');
+      c.onclick = () => { selected = d; render(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+      cal.appendChild(c);
+    }
+  }
+
+  function render() { renderDay(); renderStats(); renderCal(); }
+
+  $('prev').onclick = () => { selected = clamp(addDays(selected, -1)); render(); };
+  $('next').onclick = () => { selected = clamp(addDays(selected, 1)); render(); };
+
+  // Backup
+  $('exportBtn').onclick = async () => {
+    const json = JSON.stringify({ app: 'mygoalz', version: 1, exported: new Date().toISOString(), data }, null, 2);
+    const name = `mygoalz-backup-${ymd(new Date())}.json`;
+    const file = new File([json], name, { type: 'application/json' });
+    try {
+      if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: 'MyGoalz backup' }); return; }
+    } catch (e) { if (e.name === 'AbortError') return; }
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(file); a.download = name; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  };
+  $('importFile').onchange = async (ev) => {
+    const f = ev.target.files[0]; if (!f) return;
+    try {
+      const parsed = JSON.parse(await f.text());
+      const incoming = parsed.data || parsed;
+      if (typeof incoming !== 'object') throw new Error('bad file');
+      if (!confirm('Replace the current log with this backup?')) return;
+      data = incoming; save(); render();
+    } catch { alert('That file does not look like a MyGoalz backup.'); }
+    ev.target.value = '';
+  };
+
+  // Show install hint in Safari when not yet installed
+  const standalone = window.navigator.standalone || matchMedia('(display-mode: standalone)').matches;
+  if (!standalone && /iPhone|iPad|iPod/.test(navigator.userAgent)) $('installCard').classList.add('show');
+
+  // Refresh when the app comes back to the foreground on a new day
+  let lastDay = ymd(startOfToday());
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && ymd(startOfToday()) !== lastDay) {
+      lastDay = ymd(startOfToday()); selected = clamp(startOfToday()); render();
+    }
+  });
+
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+
+  render();
+})();
+</script>
+</body>
+</html>
