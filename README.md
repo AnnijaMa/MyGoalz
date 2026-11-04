@@ -9,7 +9,8 @@ A personal iPhone web app for logging daily goals from **4 Nov to 25 Dec 2026**:
 
 **Food log:** tap **📷 Take photo** (camera or photo library) or **✏️ Type it**, add a comment about what you ate,
 and log calories, protein, carbs, fat, fiber and sugar. The app shows daily totals (calories and protein against your own targets).
-Optional: add a Claude API key (⚙️ *Food targets & AI*) and every photo you take is calculated automatically (or tap **✨ Calculate with AI**; add a comment and tap again to refine).
+Free with a Claude subscription: tap **💬 Ask Claude** to send the photo and a ready-made question to the Claude app, copy the answer, then tap **📋 Paste answer** to fill in all values.
+Optional (paid API): add a Claude API key (⚙️ *Food targets & AI*) and every photo you take is calculated automatically (or tap **✨ Calculate with AI**; add a comment and tap again to refine).
 The key and photos stay on the phone; the photo and comment are sent to Anthropic only when you tap the button.
 
 It also shows a countdown to Christmas, your streak, totals and a calendar (tap any day to edit it).

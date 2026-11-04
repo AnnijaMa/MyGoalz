@@ -173,6 +173,9 @@
   .btn.primary { background: var(--green); color: #fff; }
   .btn.ai { background: #5b4bc4; color: #fff; width: 100%; margin-top: 12px; }
   .btn.ai:disabled { opacity: .6; }
+  .askrow { display: flex; gap: 10px; margin-top: 12px; }
+  .askrow .btn { flex: 1; margin-top: 0; white-space: nowrap; }
+  .btn.paste { background: var(--bg); color: var(--ink); border: 2px solid #5b4bc4; }
   .btn.danger { color: var(--red); background: transparent; }
   .sheet .actions { display: flex; gap: 10px; margin-top: 16px; }
   .sheet .actions .btn { flex: 1; }
@@ -263,7 +266,12 @@
     <img class="big" id="mealImg" alt="" hidden>
     <label class="lbl" for="mealNote">What did you eat?</label>
     <textarea id="mealNote" placeholder="e.g. 2 eggs, toast with butter, coffee with milk"></textarea>
-    <button class="btn ai" id="aiBtn">✨ Calculate with AI</button>
+    <div class="askrow">
+      <button class="btn ai" id="askBtn">💬 Ask Claude</button>
+      <button class="btn paste" id="pasteBtn">📋 Paste answer</button>
+    </div>
+    <div class="hint" id="askHint">“Ask Claude” copies the question and opens the share menu: pick the Claude app, paste, send. Then copy Claude’s answer and tap “Paste answer”.</div>
+    <button class="btn ai" id="aiBtn" hidden>✨ Calculate with AI</button>
     <div class="aiout" id="aiOut"></div>
     <div class="row2">
       <div><label class="lbl" for="mealKcal">Calories (kcal)</label><input type="number" inputmode="numeric" id="mealKcal" min="0"></div>
@@ -289,7 +297,7 @@
     </div>
     <label class="lbl" for="setKey">Claude API key (for “Calculate with AI”)</label>
     <input type="password" id="setKey" placeholder="sk-ant-…" autocomplete="off" autocapitalize="off" spellcheck="false">
-    <div class="hint">Optional. Create a key at console.anthropic.com. It is saved only on this iPhone and sent only to Anthropic when you tap “Calculate with AI”. Each estimate costs a few cents. Without a key you can still type calories yourself.</div>
+    <div class="hint">Optional and paid separately (not part of a Claude Pro/Max plan) – the free “Ask Claude” button works without it. Create a key at console.anthropic.com. It is saved only on this iPhone and sent only to Anthropic when you tap “Calculate with AI”. Each estimate costs a few cents. Without a key you can still type calories yourself.</div>
     <div class="actions">
       <button class="btn" id="setCancel">Cancel</button>
       <button class="btn primary" id="setSave">Save</button>
@@ -550,6 +558,10 @@
     const img = $('mealImg');
     const u = photoBlob ? URL.createObjectURL(photoBlob) : meal.photo ? await photoURL(meal.photo) : null;
     img.hidden = !u; if (u) img.src = u;
+    $('aiBtn').hidden = !settings.key;
+    // Prepare the photo for sharing now: iOS only allows sharing right inside the tap.
+    const blob = photoBlob || (meal.photo ? await getPhoto(meal.photo) : null);
+    editing.shareFile = blob ? new File([blob], 'meal.jpg', { type: 'image/jpeg' }) : null;
     openSheet('mealSheet');
   }
 
@@ -590,6 +602,62 @@
     data[k].meals = (data[k].meals || []).filter(m => m.id !== meal.id);
     if (meal.photo) { await delPhoto(meal.photo); urlCache.delete(meal.photo); }
     save(); closeSheets(); render();
+  };
+
+  // ---------- Ask Claude (uses your Claude app / Max plan, no API key) ----------
+  function askText() {
+    const note = $('mealNote').value.trim();
+    return 'Please estimate the nutrition of this meal' + (editing.shareFile ? ' in the photo' : '') + '.' +
+      (note ? ` My note: "${note}".` : '') +
+      ' List each food with a realistic portion. End your answer with exactly one line in this format (whole numbers):\n' +
+      'MYGOALZ kcal=0 protein=0 carbs=0 fat=0 fiber=0 sugar=0';
+  }
+  $('askBtn').onclick = () => {
+    if (!editing.shareFile && !$('mealNote').value.trim()) { alert('Add a photo or describe what you ate first.'); return; }
+    const text = askText();
+    // Copy the question too, because some apps drop text when a photo is shared.
+    try { navigator.clipboard && navigator.clipboard.writeText(text).catch(() => {}); } catch {}
+    const payload = editing.shareFile ? { files: [editing.shareFile], text } : { text };
+    if (navigator.share && (!payload.files || (navigator.canShare && navigator.canShare({ files: payload.files })))) {
+      navigator.share(payload).catch(() => {});
+    } else {
+      alert('The question is copied. Open the Claude app, add the photo, paste and send.');
+    }
+  };
+
+  const FIELDS = [
+    { el: 'mealKcal', names: ['kcal', 'calories', 'cal'] },
+    { el: 'mealProt', names: ['protein'] },
+    { el: 'mealCarbs', names: ['carbs', 'carbohydrates'] },
+    { el: 'mealFat', names: ['fat'] },
+    { el: 'mealFiber', names: ['fiber', 'fibre'] },
+    { el: 'mealSugar', names: ['sugar', 'sugars'] },
+  ];
+  function applyAnswer(text) {
+    const clean = text.replace(/[*_`]/g, '');
+    let found = 0;
+    for (const f of FIELDS) {
+      let val = null;
+      for (const n of f.names) {
+        const re = new RegExp(`\\b${n}\\b\\s*[=:]\\s*~?\\s*(\\d+(?:[.,]\\d+)?)`, 'gi');
+        let m; while ((m = re.exec(clean))) val = m[1]; // last match wins (the MYGOALZ line is at the end)
+        if (val != null) break;
+      }
+      if (val != null) { $(f.el).value = Math.round(parseFloat(val.replace(',', '.'))); found++; }
+    }
+    if (!found) return false;
+    const summary = clean.split('\n').filter(l => !/MYGOALZ/i.test(l)).join('\n').trim();
+    $('aiOut').textContent = (summary.length > 700 ? summary.slice(0, 700) + '…' : summary) + '\n(Claude estimate – adjust if needed)';
+    return true;
+  }
+  $('pasteBtn').onclick = async () => {
+    let text = '';
+    try { text = await navigator.clipboard.readText(); } catch {}
+    if (!text || !applyAnswer(text)) {
+      const typed = prompt('Paste Claude’s answer here:', '');
+      if (typed == null) return;
+      if (!applyAnswer(typed)) alert('I could not find the numbers. Make sure the answer has the line starting with MYGOALZ.');
+    }
   };
 
   // ---------- AI estimate (Claude API, your own key) ----------
