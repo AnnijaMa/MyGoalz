@@ -259,7 +259,7 @@
       <label>Import<input type="file" id="importFile" accept="application/json,.json" hidden></label>
     </div>
     <div class="hint">Your log and food photos are stored only on this iPhone. Export now and then to keep a copy (e.g. in Files or iCloud Drive).</div>
-    <div class="settings-row"><button class="btn" id="settingsBtn">⚙️ Food targets &amp; AI</button></div>
+    <div class="settings-row"><button class="btn" id="settingsBtn">⚙️ Food targets, shake &amp; AI</button></div>
   </section>
 
   <div class="sheet-bg" id="sheetBg"></div>
@@ -294,11 +294,14 @@
 
   <!-- Settings -->
   <div class="sheet" id="setSheet" role="dialog" aria-label="Settings">
-    <h3>Food targets &amp; AI</h3>
+    <h3>Food targets, shake &amp; AI</h3>
     <div class="row2">
       <div><label class="lbl" for="setKcal">Daily calories target</label><input type="number" inputmode="numeric" id="setKcal" placeholder="optional"></div>
       <div><label class="lbl" for="setProt">Daily protein target (g)</label><input type="number" inputmode="numeric" id="setProt" placeholder="optional"></div>
     </div>
+    <label class="lbl">🥤 Your protein shake (one serving, from the label)</label>
+    <div class="row2" id="shakeFields"></div>
+    <div class="hint">Ticking “Protein shake” adds these values to that day’s food totals automatically.</div>
     <label class="lbl" for="setKey">Claude API key (for “Calculate with AI”)</label>
     <input type="password" id="setKey" placeholder="sk-ant-…" autocomplete="off" autocapitalize="off" spellcheck="false">
     <div class="hint">Optional and paid separately (not part of a Claude Pro/Max plan) – the free “Ask Claude” button works without it. Create a key at console.anthropic.com. It is saved only on this iPhone and sent only to Anthropic when you tap “Calculate with AI”. Each estimate costs a few cents. Without a key you can still type calories yourself.</div>
@@ -384,6 +387,7 @@
           setField(d, done ? { move: false, moveMin: 0 } : { move: true, moveMin: Math.max(e.moveMin || 0, MOVE_GOAL) });
         } else {
           setField(d, { [t.id]: !done });
+          if (t.id === 'shake') syncShakeMeal(d, !done);
         }
       };
       wrap.appendChild(btn);
@@ -761,9 +765,28 @@
     }
   };
 
+  // ---------- Protein shake → food log ----------
+  const SHAKE_FIELDS = [
+    { key: 'kcal', label: 'Calories (kcal)', def: 120 }, { key: 'protein', label: 'Protein (g)', def: 24 },
+    { key: 'carbs', label: 'Carbs (g)', def: 3 }, { key: 'fat', label: 'Fat (g)', def: 2 },
+    { key: 'fiber', label: 'Fiber (g)', def: 0 }, { key: 'sugar', label: 'Sugar (g)', def: 2 },
+  ];
+  const shakeValues = () => Object.fromEntries(SHAKE_FIELDS.map(f => [f.key, (settings.shake && settings.shake[f.key] != null) ? settings.shake[f.key] : f.def]));
+  function syncShakeMeal(d, on) {
+    const k = ymd(d), id = 'shake-' + k;
+    data[k] = Object.assign({}, data[k]);
+    const meals = (data[k].meals || []).filter(m => m.id !== id);
+    if (on) meals.push(Object.assign({ id, auto: 'shake', note: '🥤 Protein shake', time: newMealTime() }, shakeValues()));
+    data[k].meals = meals;
+    save(); render();
+  }
+  $('shakeFields').innerHTML = SHAKE_FIELDS.map(f =>
+    `<div><label class="lbl" for="shake_${f.key}">${f.label}</label><input type="number" inputmode="decimal" min="0" id="shake_${f.key}"></div>`).join('');
+
   // Settings sheet
   function openSettings() {
     $('setKcal').value = settings.kcal || ''; $('setProt').value = settings.prot || ''; $('setKey').value = settings.key || '';
+    const sv = shakeValues(); for (const f of SHAKE_FIELDS) $('shake_' + f.key).value = sv[f.key];
     openSheet('setSheet');
   }
   $('settingsBtn').onclick = openSettings;
@@ -772,7 +795,10 @@
     settings.kcal = num($('setKcal').value) || undefined;
     settings.prot = num($('setProt').value) || undefined;
     settings.key = $('setKey').value.trim() || undefined;
-    saveSettings(); closeSheets(); render();
+    settings.shake = Object.fromEntries(SHAKE_FIELDS.map(f => [f.key, num($('shake_' + f.key).value) ?? f.def]));
+    // Update shakes already logged so totals use the new label values.
+    for (const day of Object.values(data)) for (const m of (day.meals || [])) if (m.auto === 'shake') Object.assign(m, settings.shake);
+    save(); saveSettings(); closeSheets(); render();
   };
 
   function render() { renderDay(); renderFood(); renderStats(); renderCal(); }
