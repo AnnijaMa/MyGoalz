@@ -301,7 +301,7 @@
     </div>
     <label class="lbl">🥤 Your protein shake (one serving, from the label)</label>
     <div class="row2" id="shakeFields"></div>
-    <div class="hint">Ticking “Protein shake” adds these values to that day’s food totals automatically.</div>
+    <div class="hint">Ticking “Protein shake” adds these values to that day’s food totals automatically. Drank more? Use + 1 under the shake.</div>
     <label class="lbl" for="setKey">Claude API key (for “Calculate with AI”)</label>
     <input type="password" id="setKey" placeholder="sk-ant-…" autocomplete="off" autocapitalize="off" spellcheck="false">
     <div class="hint">Optional and paid separately (not part of a Claude Pro/Max plan) – the free “Ask Claude” button works without it. Create a key at console.anthropic.com. It is saved only on this iPhone and sent only to Anthropic when you tap “Calculate with AI”. Each estimate costs a few cents. Without a key you can still type calories yourself.</div>
@@ -386,11 +386,22 @@
           // toggle: mark full 45 min, or clear
           setField(d, done ? { move: false, moveMin: 0 } : { move: true, moveMin: Math.max(e.moveMin || 0, MOVE_GOAL) });
         } else {
+          if (t.id === 'shake') { setShakes(d, done ? 0 : 1); return; }
           setField(d, { [t.id]: !done });
-          if (t.id === 'shake') syncShakeMeal(d, !done);
         }
       };
       wrap.appendChild(btn);
+
+      if (t.id === 'shake' && done) {
+        const n = e.shakeCount || 1;
+        const bar = document.createElement('div');
+        bar.className = 'movebar';
+        bar.innerHTML = `<button data-d="-1">− 1</button>
+          <div class="mins"><b>${n}</b> ${n === 1 ? 'shake' : 'shakes'} today</div>
+          <button data-d="1">+ 1</button>`;
+        bar.querySelectorAll('button').forEach(b => b.onclick = () => setShakes(d, Math.max(0, Math.min(10, n + Number(b.dataset.d)))));
+        wrap.appendChild(bar);
+      }
 
       if (t.minutes) {
         const mins = e.moveMin || (e.move ? MOVE_GOAL : 0);
@@ -421,7 +432,7 @@
       const e = entry(d);
       if (status(d).full && (e.supp || e.shake || e.move || e.moveMin)) perfect++;
       if (e.supp) supp++;
-      if (e.shake) shake++;
+      if (e.shake) shake += e.shakeCount || 1;
       mins += e.moveMin || (e.move ? MOVE_GOAL : 0);
     }
     for (const w of weds) if (entry(w).oz) ozDone++;
@@ -772,12 +783,17 @@
     { key: 'fiber', label: 'Fiber (g)', def: 0 }, { key: 'sugar', label: 'Sugar (g)', def: 2 },
   ];
   const shakeValues = () => Object.fromEntries(SHAKE_FIELDS.map(f => [f.key, (settings.shake && settings.shake[f.key] != null) ? settings.shake[f.key] : f.def]));
-  function syncShakeMeal(d, on) {
+  const shakeTotals = n => Object.fromEntries(Object.entries(shakeValues()).map(([k, v]) => [k, Math.round(v * n)]));
+  const shakeNote = n => '🥤 Protein shake' + (n > 1 ? ` ×${n}` : '');
+  // Set how many shakes were drunk that day; keeps one food-log entry in sync (0 removes it).
+  function setShakes(d, n) {
     const k = ymd(d), id = 'shake-' + k;
-    data[k] = Object.assign({}, data[k]);
-    const meals = (data[k].meals || []).filter(m => m.id !== id);
-    if (on) meals.push(Object.assign({ id, auto: 'shake', note: '🥤 Protein shake', time: newMealTime() }, shakeValues()));
-    data[k].meals = meals;
+    data[k] = Object.assign({}, data[k], { shake: n > 0, shakeCount: n });
+    const meals = data[k].meals || [];
+    const old = meals.find(m => m.id === id);
+    const rest = meals.filter(m => m.id !== id);
+    if (n > 0) rest.push(Object.assign({ id, auto: 'shake', time: old ? old.time : newMealTime() }, shakeTotals(n), { servings: n, note: shakeNote(n) }));
+    data[k].meals = rest;
     save(); render();
   }
   $('shakeFields').innerHTML = SHAKE_FIELDS.map(f =>
@@ -797,7 +813,7 @@
     settings.key = $('setKey').value.trim() || undefined;
     settings.shake = Object.fromEntries(SHAKE_FIELDS.map(f => [f.key, num($('shake_' + f.key).value) ?? f.def]));
     // Update shakes already logged so totals use the new label values.
-    for (const day of Object.values(data)) for (const m of (day.meals || [])) if (m.auto === 'shake') Object.assign(m, settings.shake);
+    for (const day of Object.values(data)) for (const m of (day.meals || [])) if (m.auto === 'shake') Object.assign(m, shakeTotals(m.servings || 1));
     save(); saveSettings(); closeSheets(); render();
   };
 
