@@ -7,6 +7,7 @@ A personal iPhone web app for logging daily goals from **4 Nov to 25 Dec 2026**:
 - 🥤 Protein shake, daily
 - 🏋️ Weight training with trainer, Tuesday & Thursday
 - 🧘 Pilates, Friday
+- ⚖️ Weigh-in, Friday (weight history and change shown under Progress)
 - 🏃 45 minutes of movement on days without training (Sat–Mon, Wed) (tap to tick it off, or log minutes in steps of ±5 / ±15)
 
 **Food log:** tap **📷 Take photo** (camera or photo library) or **✏️ Type it**, add a comment about what you ate,

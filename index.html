@@ -93,6 +93,18 @@
   .movebar button { flex: none; border: 0; border-radius: 10px; padding: 8px 12px; font: inherit; font-weight: 600; background: var(--bg); color: var(--ink); cursor: pointer; }
   .movebar .mins { flex: 1; text-align: center; font-variant-numeric: tabular-nums; color: var(--muted); font-size: 14px; }
   .movebar .mins b { color: var(--ink); font-size: 17px; }
+  .tasks { grid-template-columns: minmax(0, 1fr); }
+  .movebar input { flex: 1; min-width: 0; width: 100%; font: inherit; font-size: 17px; font-weight: 600; color: var(--ink); background: var(--bg);
+    border: 2px solid var(--line); border-radius: 10px; padding: 8px 12px; }
+  .movebar .unit { color: var(--muted); font-weight: 600; }
+  .movebar #weightSave { background: var(--green); color: #fff; }
+  .weighins { margin-top: 14px; }
+  .weighins h3 { font-size: 14px; margin: 0 0 6px; }
+  .wrow { display: flex; justify-content: space-between; gap: 8px; padding: 7px 0; border-top: 1px solid var(--line); font-size: 14px; font-variant-numeric: tabular-nums; }
+  .wrow .dt { color: var(--muted); }
+  .wrow .ch { min-width: 64px; text-align: right; color: var(--muted); }
+  .wrow .ch.down { color: var(--green); font-weight: 600; }
+  .wsum { font-size: 14px; margin-top: 4px; }
 
   .daydone { margin-top: 12px; text-align: center; font-weight: 700; color: var(--green); min-height: 22px; }
 
@@ -238,6 +250,7 @@
       <div class="stat"><div class="n" id="stSupp">0</div><div class="l">💊 supplement days</div></div>
       <div class="stat"><div class="n" id="stShake">0</div><div class="l">🥤 protein shakes</div></div>
     </div>
+    <div class="weighins" id="weighins"></div>
   </section>
 
   <section class="card">
@@ -248,7 +261,7 @@
       <span><i style="background:var(--partial)"></i>partly</span>
       <span><i style="background:var(--card);border:1px solid var(--line)"></i>missed</span>
       <span><i style="background:var(--red);border-radius:50%"></i>injection day</span>
-      <span>🏋️ training · 🧘 Pilates</span>
+      <span>🏋️ training · 🧘 Pilates · ⚖️ weigh-in</span>
     </div>
   </section>
 
@@ -325,6 +338,7 @@
     { id: 'oz',    emoji: '💉', name: 'Ozempic injection', sub: 'Every Wednesday', days: [3] },
     { id: 'gym',   emoji: '🏋️', name: 'Weight training',   sub: 'With trainer · Tuesday & Thursday', days: [2, 4] },
     { id: 'pil',   emoji: '🧘', name: 'Pilates',           sub: 'Every Friday', days: [5] },
+    { id: 'weigh', emoji: '⚖️', name: 'Weigh-in',          sub: 'Every Friday', days: [5], weight: true },
     { id: 'supp',  emoji: '💊', name: 'Supplements',       sub: 'Daily' },
     { id: 'shake', emoji: '🥤', name: 'Protein shake',     sub: 'Daily' },
     { id: 'move',  emoji: '🏃', name: 'Move 45 minutes',   sub: 'Days without training', minutes: true, days: [0, 1, 3, 6] },
@@ -349,6 +363,7 @@
   const entry = d => data[ymd(d)] || {};
   const isDone = (d, t) => {
     const e = entry(d);
+    if (t.weight) return e.weight != null;
     return t.minutes ? (e.moveMin || 0) >= MOVE_GOAL || !!e.move : !!e[t.id];
   };
   const status = d => {
@@ -380,8 +395,10 @@
       const done = isDone(d, t);
       const btn = document.createElement('button');
       btn.className = 'task' + (done ? ' done' : '') + (t.id === 'oz' ? ' oz' : '');
-      btn.innerHTML = `<span class="emoji">${t.emoji}</span><span class="txt"><b>${t.name}</b><span>${t.sub}</span></span><span class="check">${done ? '✓' : ''}</span>`;
+      const sub = t.weight && e.weight != null ? `${fmtKg(e.weight)} kg` : t.sub;
+      btn.innerHTML = `<span class="emoji">${t.emoji}</span><span class="txt"><b>${t.name}</b><span>${sub}</span></span><span class="check">${done ? '✓' : ''}</span>`;
       btn.onclick = () => {
+        if (t.weight) { const i = $('weightInput'); i.focus(); i.select(); return; }
         if (t.minutes) {
           // toggle: mark full 45 min, or clear
           setField(d, done ? { move: false, moveMin: 0 } : { move: true, moveMin: Math.max(e.moveMin || 0, MOVE_GOAL) });
@@ -391,6 +408,25 @@
         }
       };
       wrap.appendChild(btn);
+
+      if (t.weight) {
+        const bar = document.createElement('div');
+        bar.className = 'movebar';
+        bar.innerHTML = `<input id="weightInput" type="text" inputmode="decimal" placeholder="Your weight" autocomplete="off">
+          <span class="unit">kg</span><button id="weightSave">Save</button>`;
+        const inp = bar.querySelector('input');
+        inp.value = e.weight != null ? fmtKg(e.weight) : '';
+        const commit = () => {
+          const raw = inp.value.trim().replace(',', '.');
+          if (raw === '') { setField(d, { weight: undefined }); return; }
+          const v = parseFloat(raw);
+          if (!(v > 20 && v < 400)) { alert('Please enter your weight in kg, e.g. 82.4'); return; }
+          setField(d, { weight: Math.round(v * 10) / 10 });
+        };
+        bar.querySelector('button').onclick = commit;
+        inp.onkeydown = ev => { if (ev.key === 'Enter') { ev.preventDefault(); inp.blur(); commit(); } };
+        wrap.appendChild(bar);
+      }
 
       if (t.id === 'shake' && done) {
         const n = e.shakeCount || 1;
@@ -418,12 +454,30 @@
       }
     }
     const st = status(d);
-    const special = { 2: 'training included! 💪', 3: 'injection included! 🎉', 4: 'training included! 💪', 5: 'Pilates included! 🧘' }[d.getDay()];
+    const special = { 2: 'training included! 💪', 3: 'injection included! 🎉', 4: 'training included! 💪', 5: 'Pilates and weigh-in included! 🧘' }[d.getDay()];
     $('dayDone').textContent = st.full ? (special ? `Everything done – ${special}` : 'All goals done today! 🎉')
                                        : `${st.n} of ${st.total} done`;
   }
 
+  const fmtKg = v => (Math.round(v * 10) / 10).toFixed(1);
+  function renderWeighins() {
+    const rows = allDays.filter(d => entry(d).weight != null).map(d => ({ d, w: entry(d).weight }));
+    const box = $('weighins');
+    if (!rows.length) { box.innerHTML = '<h3>⚖️ Weigh-ins</h3><div class="hint">Log your weight every Friday – it will show up here.</div>'; return; }
+    const first = rows[0].w, last = rows[rows.length - 1].w, total = Math.round((last - first) * 10) / 10;
+    const sign = v => v > 0 ? '+' + fmtKg(v) : v < 0 ? '−' + fmtKg(-v) : '±0.0';
+    let html = '<h3>⚖️ Weigh-ins</h3>';
+    if (rows.length > 1) html += `<div class="wsum">Since ${rows[0].d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}: <b>${sign(total)} kg</b></div>`;
+    rows.forEach((r, i) => {
+      const ch = i ? Math.round((r.w - rows[i - 1].w) * 10) / 10 : null;
+      html += `<div class="wrow"><span class="dt">${r.d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}</span>
+        <b>${fmtKg(r.w)} kg</b><span class="ch${ch < 0 ? ' down' : ''}">${ch == null ? 'start' : sign(ch)}</span></div>`;
+    });
+    box.innerHTML = html;
+  }
+
   function renderStats() {
+    renderWeighins();
     const today = startOfToday();
     const past = allDays.filter(d => d <= today);
     let perfect = 0, supp = 0, shake = 0, mins = 0, ozDone = 0;
@@ -483,7 +537,7 @@
       if (ymd(d) === ymd(selected)) cls += ' sel';
       if (ymd(d) === ymd(END)) cls += ' xmas';
       c.className = cls;
-      const mark = { 2: '🏋️', 3: '', 4: '🏋️', 5: '🧘' }[d.getDay()];
+      const mark = { 2: '🏋️', 3: '', 4: '🏋️', 5: '🧘⚖️' }[d.getDay()];
       c.innerHTML = (ymd(d) === ymd(END) ? '🎄' : d.getDate()) + (d.getDay() === WED ? '<span class="dot"></span>' : '') +
         (mark ? `<span class="mk">${mark}</span>` : '');
       c.onclick = () => { selected = d; render(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
