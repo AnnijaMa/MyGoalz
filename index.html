@@ -164,9 +164,12 @@
   .meal .mt .note { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .meal .mt .sub { color: var(--muted); font-size: 13px; }
   .macros { color: var(--muted); font-size: 13px; margin-top: 8px; font-variant-numeric: tabular-nums; }
-  .micros { font-size: 13px; color: var(--muted); margin-top: 8px; columns: 2; column-gap: 16px; }
+  .micros { font-size: 13px; color: var(--muted); margin-top: 8px; }
   .micros:empty { display: none; }
-  .micros b { display: block; color: var(--ink); column-span: all; margin-bottom: 4px; }
+  .micros summary { color: var(--ink); font-weight: 700; cursor: pointer; }
+  .micros summary span { color: var(--muted); font-weight: 400; }
+  .micros .mlist { margin-top: 6px; }
+  .micros .mlist div { display: flex; padding: 3px 0; border-top: 1px solid var(--line); }
   .empty-note { color: var(--muted); font-size: 14px; margin-top: 10px; }
 
   .sheet-bg { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: none; z-index: 10; }
@@ -323,7 +326,7 @@
     <div class="hint">Ticking “Protein shake” adds these values to that day’s food totals automatically. Drank more? Use + 1 under the shake.</div>
     <label class="lbl">🍓 Daily100 (one sachet, from the label)</label>
     <div class="row2" id="d100Fields"></div>
-    <label class="lbl" for="d100Micros">Vitamins &amp; minerals per sachet (optional, one per line)</label>
+    <label class="lbl" for="d100Micros">Vitamins &amp; minerals per sachet (from your pack, one per line)</label>
     <textarea id="d100Micros" placeholder="Vitamin C 200 mg&#10;Vitamin D 20 µg&#10;Magnesium 100 mg"></textarea>
     <div class="hint">Ticking “Daily100” adds these values to that day’s food summary.</div>
     <label class="lbl" for="setKey">Claude API key (for “Calculate with AI”)</label>
@@ -416,7 +419,7 @@
       const done = isDone(d, t);
       const btn = document.createElement('button');
       btn.className = 'task' + (done ? ' done' : '') + (t.id === 'oz' ? ' oz' : '');
-      const sub = t.id === 'd100' && !settings.d100 ? 'Add the label values in ⚙️ settings (bottom)'
+      const sub = t.id === 'd100' && !d100HasMacros() ? 'MORE Nutrition · add calories in ⚙️ settings'
         : t.weight && e.weight != null ? weightSub(d, e.weight) : (t.weight && isStartWeigh(d) ? 'Starting weight' : t.sub);
       btn.innerHTML = `<span class="emoji">${t.emoji}</span><span class="txt"><b>${t.name}</b><span>${sub}</span></span><span class="check">${done ? '✓' : ''}</span>`;
       btn.onclick = () => {
@@ -637,10 +640,12 @@
       `<b>${kcal}</b>${settings.kcal ? ' / ' + settings.kcal : ''} kcal<br><b>${prot}</b>${settings.prot ? ' / ' + settings.prot : ''} g protein`;
     $('macroTotals').textContent = meals.length
       ? `Carbs ${sum('carbs')} g · Fat ${sum('fat')} g · Fiber ${sum('fiber')} g · Sugar ${sum('sugar')} g` : '';
-    const micros = meals.some(m => m.auto === 'd100') && settings.d100 && settings.d100.micros;
-    $('microTotals').innerHTML = micros
-      ? '<b>🍓 Vitamins &amp; minerals from Daily100</b>' + micros.split('\n').map(l => l.trim()).filter(Boolean)
-          .map(l => `<div>${l.replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]))}</div>`).join('') : '';
+    const micros = meals.some(m => m.auto === 'd100') && d100Micros();
+    const microLines = micros ? micros.split('\n').map(l => l.trim()).filter(Boolean) : [];
+    $('microTotals').innerHTML = microLines.length
+      ? `<details><summary>🍓 Vitamins &amp; minerals from Daily100 <span>(${microLines.length}) – tap to show</span></summary><div class="mlist">` +
+        microLines.map(l => `<div>${l.replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c])).replace(/ %\)/g, '&nbsp;%)')}</div>`).join('') +
+        '</div></details>' : '';
     const list = $('meals'); list.innerHTML = '';
     if (!meals.length) { list.innerHTML = '<div class="empty-note">No meals logged for this day yet.</div>'; return; }
     for (const m of [...meals].sort((a, b) => a.time.localeCompare(b.time))) {
@@ -892,6 +897,19 @@
 
   // ---------- Daily100 (MORE Nutrition) → food log ----------
   const D100_FIELDS = SHAKE_FIELDS.map(f => ({ key: f.key, label: f.label }));
+  // From the Daily100 True Berries pack, per daily serving (40 g sachet), with % of daily reference value.
+  const D100_MICROS = [
+    'Vitamin C 125 mg (156 %)', 'Niacin 16 mg (100 %)', 'Vitamin E 12 mg (100 %)', 'Pantothenic acid 6.0 mg (100 %)',
+    'Vitamin B6 2.1 mg (150 %)', 'Riboflavin (B2) 1.4 mg (100 %)', 'Thiamin (B1) 1.1 mg (100 %)', 'Folic acid 300 µg (150 %)',
+    'Vitamin A 400 µg (50 %)', 'Biotin 100 µg (200 %)', 'Vitamin K 50 µg (67 %)', 'Vitamin D 25 µg (500 %)', 'Vitamin B12 12 µg (480 %)',
+    'Calcium 401 mg (50 %)', 'Magnesium 250 mg (67 %)', 'Zinc 8.0 mg (80 %)', 'Manganese 1.6 mg (80 %)', 'Iron 7.5 mg (54 %)',
+    'Iodine 125 µg (83 %)', 'Selenium 55 µg (100 %)', 'Chromium 20 µg (50 %)', 'Copper 0.50 mg (50 %)', 'Molybdenum 45 µg (90 %)',
+    'Creatine 2534 mg', 'L-Glycine 2454 mg', 'L-Glutamine 2000 mg', 'Myo-inositol 1000 mg', 'Taurine 750 mg', 'L-Carnitine 500 mg',
+    'Ashwagandha (KSM-66) 250 mg', 'Choline 201 mg', 'Green tea extract 200 mg (EGCG 90 mg)', 'Coenzyme Q10 50 mg',
+    'Probiotic B. lactis 10 bn CFU',
+  ].join('\n');
+  const d100Micros = () => (settings.d100 && settings.d100.micros) || D100_MICROS;
+  const d100HasMacros = () => !!(settings.d100 && D100_FIELDS.some(f => settings.d100[f.key]));
   const d100Values = () => Object.fromEntries(D100_FIELDS.map(f => [f.key, (settings.d100 && settings.d100[f.key]) || 0]));
   function setDaily100(d, on) {
     const k = ymd(d), id = 'd100-' + k;
@@ -909,7 +927,7 @@
   // Settings sheet
   function openSettings() {
     for (const f of D100_FIELDS) $('d100_' + f.key).value = settings.d100 && settings.d100[f.key] != null ? settings.d100[f.key] : '';
-    $('d100Micros').value = (settings.d100 && settings.d100.micros) || '';
+    $('d100Micros').value = d100Micros();
     $('setKcal').value = settings.kcal || ''; $('setProt').value = settings.prot || ''; $('setKey').value = settings.key || '';
     const sv = shakeValues(); for (const f of SHAKE_FIELDS) $('shake_' + f.key).value = sv[f.key];
     openSheet('setSheet');
@@ -921,7 +939,7 @@
     settings.prot = num($('setProt').value) || undefined;
     settings.key = $('setKey').value.trim() || undefined;
     settings.shake = Object.fromEntries(SHAKE_FIELDS.map(f => [f.key, num($('shake_' + f.key).value) ?? f.def]));
-    const d100Typed = D100_FIELDS.some(f => $('d100_' + f.key).value !== '') || $('d100Micros').value.trim();
+    const d100Typed = D100_FIELDS.some(f => $('d100_' + f.key).value !== '') || $('d100Micros').value.trim() !== D100_MICROS;
     settings.d100 = d100Typed ? Object.assign(Object.fromEntries(D100_FIELDS.map(f => [f.key, num($('d100_' + f.key).value) ?? 0])),
       { micros: $('d100Micros').value.trim() }) : undefined;
     for (const day of Object.values(data)) for (const m of (day.meals || [])) if (m.auto === 'd100') Object.assign(m, d100Values());
