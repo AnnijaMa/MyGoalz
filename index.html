@@ -164,6 +164,9 @@
   .meal .mt .note { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .meal .mt .sub { color: var(--muted); font-size: 13px; }
   .macros { color: var(--muted); font-size: 13px; margin-top: 8px; font-variant-numeric: tabular-nums; }
+  .micros { font-size: 13px; color: var(--muted); margin-top: 8px; columns: 2; column-gap: 16px; }
+  .micros:empty { display: none; }
+  .micros b { display: block; color: var(--ink); column-span: all; margin-bottom: 4px; }
   .empty-note { color: var(--muted); font-size: 14px; margin-top: 10px; }
 
   .sheet-bg { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: none; z-index: 10; }
@@ -236,6 +239,7 @@
       <button class="alt" id="noPhotoBtn">✏️ Type it</button>
     </div>
     <div class="macros" id="macroTotals"></div>
+    <div class="micros" id="microTotals"></div>
     <div class="meals" id="meals"></div>
   </section>
 
@@ -274,7 +278,7 @@
       <label>Import<input type="file" id="importFile" accept="application/json,.json" hidden></label>
     </div>
     <div class="hint">Your log and food photos are stored only on this iPhone. Export now and then to keep a copy (e.g. in Files or iCloud Drive).</div>
-    <div class="settings-row"><button class="btn" id="settingsBtn">⚙️ Food targets, shake &amp; AI</button></div>
+    <div class="settings-row"><button class="btn" id="settingsBtn">⚙️ Food targets, shake, Daily100 &amp; AI</button></div>
   </section>
 
   <div class="sheet-bg" id="sheetBg"></div>
@@ -317,6 +321,11 @@
     <label class="lbl">🥤 Your protein shake (one serving, from the label)</label>
     <div class="row2" id="shakeFields"></div>
     <div class="hint">Ticking “Protein shake” adds these values to that day’s food totals automatically. Drank more? Use + 1 under the shake.</div>
+    <label class="lbl">🍓 Daily100 (one sachet, from the label)</label>
+    <div class="row2" id="d100Fields"></div>
+    <label class="lbl" for="d100Micros">Vitamins &amp; minerals per sachet (optional, one per line)</label>
+    <textarea id="d100Micros" placeholder="Vitamin C 200 mg&#10;Vitamin D 20 µg&#10;Magnesium 100 mg"></textarea>
+    <div class="hint">Ticking “Daily100” adds these values to that day’s food summary.</div>
     <label class="lbl" for="setKey">Claude API key (for “Calculate with AI”)</label>
     <input type="password" id="setKey" placeholder="sk-ant-…" autocomplete="off" autocapitalize="off" spellcheck="false">
     <div class="hint">Optional and paid separately (not part of a Claude Pro/Max plan) – the free “Ask Claude” button works without it. Create a key at console.anthropic.com. It is saved only on this iPhone and sent only to Anthropic when you tap “Calculate with AI”. Each estimate costs a few cents. Without a key you can still type calories yourself.</div>
@@ -343,6 +352,7 @@
     { id: 'weigh', emoji: '⚖️', name: 'Weigh-in',          sub: 'Every Friday', days: [5], dates: ['2026-11-04'], weight: true },
     { id: 'supp',  emoji: '💊', name: 'Supplements',       sub: 'Daily' },
     { id: 'shake', emoji: '🥤', name: 'Protein shake',     sub: 'Daily' },
+    { id: 'd100',  emoji: '🍓', name: 'Daily100',          sub: 'MORE Nutrition · daily' },
     { id: 'move',  emoji: '🏃', name: 'Move 45 minutes',   sub: 'Days without training', minutes: true, days: [0, 1, 3, 6] },
   ];
 
@@ -406,7 +416,8 @@
       const done = isDone(d, t);
       const btn = document.createElement('button');
       btn.className = 'task' + (done ? ' done' : '') + (t.id === 'oz' ? ' oz' : '');
-      const sub = t.weight && e.weight != null ? weightSub(d, e.weight) : (t.weight && isStartWeigh(d) ? 'Starting weight' : t.sub);
+      const sub = t.id === 'd100' && !settings.d100 ? 'Add the label values in ⚙️ settings (bottom)'
+        : t.weight && e.weight != null ? weightSub(d, e.weight) : (t.weight && isStartWeigh(d) ? 'Starting weight' : t.sub);
       btn.innerHTML = `<span class="emoji">${t.emoji}</span><span class="txt"><b>${t.name}</b><span>${sub}</span></span><span class="check">${done ? '✓' : ''}</span>`;
       btn.onclick = () => {
         if (t.weight) { const i = $('weightInput'); i.focus(); i.select(); return; }
@@ -415,6 +426,7 @@
           setField(d, done ? { move: false, moveMin: 0 } : { move: true, moveMin: Math.max(e.moveMin || 0, MOVE_GOAL) });
         } else {
           if (t.id === 'shake') { setShakes(d, done ? 0 : 1); return; }
+          if (t.id === 'd100') { setDaily100(d, !done); return; }
           setField(d, { [t.id]: !done });
         }
       };
@@ -625,6 +637,10 @@
       `<b>${kcal}</b>${settings.kcal ? ' / ' + settings.kcal : ''} kcal<br><b>${prot}</b>${settings.prot ? ' / ' + settings.prot : ''} g protein`;
     $('macroTotals').textContent = meals.length
       ? `Carbs ${sum('carbs')} g · Fat ${sum('fat')} g · Fiber ${sum('fiber')} g · Sugar ${sum('sugar')} g` : '';
+    const micros = meals.some(m => m.auto === 'd100') && settings.d100 && settings.d100.micros;
+    $('microTotals').innerHTML = micros
+      ? '<b>🍓 Vitamins &amp; minerals from Daily100</b>' + micros.split('\n').map(l => l.trim()).filter(Boolean)
+          .map(l => `<div>${l.replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]))}</div>`).join('') : '';
     const list = $('meals'); list.innerHTML = '';
     if (!meals.length) { list.innerHTML = '<div class="empty-note">No meals logged for this day yet.</div>'; return; }
     for (const m of [...meals].sort((a, b) => a.time.localeCompare(b.time))) {
@@ -874,8 +890,26 @@
   $('shakeFields').innerHTML = SHAKE_FIELDS.map(f =>
     `<div><label class="lbl" for="shake_${f.key}">${f.label}</label><input type="number" inputmode="decimal" min="0" id="shake_${f.key}"></div>`).join('');
 
+  // ---------- Daily100 (MORE Nutrition) → food log ----------
+  const D100_FIELDS = SHAKE_FIELDS.map(f => ({ key: f.key, label: f.label }));
+  const d100Values = () => Object.fromEntries(D100_FIELDS.map(f => [f.key, (settings.d100 && settings.d100[f.key]) || 0]));
+  function setDaily100(d, on) {
+    const k = ymd(d), id = 'd100-' + k;
+    data[k] = Object.assign({}, data[k], { d100: on });
+    const meals = data[k].meals || [];
+    const old = meals.find(m => m.id === id);
+    const rest = meals.filter(m => m.id !== id);
+    if (on) rest.push(Object.assign({ id, auto: 'd100', time: old ? old.time : newMealTime(), note: '🍓 Daily100' }, d100Values()));
+    data[k].meals = rest;
+    save(); render();
+  }
+  $('d100Fields').innerHTML = D100_FIELDS.map(f =>
+    `<div><label class="lbl" for="d100_${f.key}">${f.label}</label><input type="number" inputmode="decimal" min="0" id="d100_${f.key}"></div>`).join('');
+
   // Settings sheet
   function openSettings() {
+    for (const f of D100_FIELDS) $('d100_' + f.key).value = settings.d100 && settings.d100[f.key] != null ? settings.d100[f.key] : '';
+    $('d100Micros').value = (settings.d100 && settings.d100.micros) || '';
     $('setKcal').value = settings.kcal || ''; $('setProt').value = settings.prot || ''; $('setKey').value = settings.key || '';
     const sv = shakeValues(); for (const f of SHAKE_FIELDS) $('shake_' + f.key).value = sv[f.key];
     openSheet('setSheet');
@@ -887,6 +921,10 @@
     settings.prot = num($('setProt').value) || undefined;
     settings.key = $('setKey').value.trim() || undefined;
     settings.shake = Object.fromEntries(SHAKE_FIELDS.map(f => [f.key, num($('shake_' + f.key).value) ?? f.def]));
+    const d100Typed = D100_FIELDS.some(f => $('d100_' + f.key).value !== '') || $('d100Micros').value.trim();
+    settings.d100 = d100Typed ? Object.assign(Object.fromEntries(D100_FIELDS.map(f => [f.key, num($('d100_' + f.key).value) ?? 0])),
+      { micros: $('d100Micros').value.trim() }) : undefined;
+    for (const day of Object.values(data)) for (const m of (day.meals || [])) if (m.auto === 'd100') Object.assign(m, d100Values());
     // Update shakes already logged so totals use the new label values.
     for (const day of Object.values(data)) for (const m of (day.meals || [])) if (m.auto === 'shake') Object.assign(m, shakeTotals(m.servings || 1));
     save(); saveSettings(); closeSheets(); render();
