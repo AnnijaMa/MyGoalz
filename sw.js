@@ -1,4 +1,4 @@
-const CACHE = 'mygoalz-v13';
+const CACHE = 'mygoalz-v14';
 const ASSETS = ['./', 'index.html', 'manifest.json', 'icon-180.png', 'icon-192.png', 'icon-512.png', 'vendor/anthropic-sdk-0.137.0.js'];
 
 self.addEventListener('install', e => {

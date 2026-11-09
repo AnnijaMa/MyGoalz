@@ -324,7 +324,7 @@
     <label class="lbl">🥤 Your protein shake (one serving, from the label)</label>
     <div class="row2" id="shakeFields"></div>
     <div class="hint">Ticking “Protein shake” adds these values to that day’s food totals automatically. Drank more? Use + 1 under the shake.</div>
-    <label class="lbl">🍓 Daily100 (one sachet, from the label)</label>
+    <label class="lbl">🍓 Daily100 (one 40 g sachet)</label>
     <div class="row2" id="d100Fields"></div>
     <label class="lbl" for="d100Micros">Vitamins &amp; minerals per sachet (from your pack, one per line)</label>
     <textarea id="d100Micros" placeholder="Vitamin C 200 mg&#10;Vitamin D 20 µg&#10;Magnesium 100 mg"></textarea>
@@ -419,8 +419,7 @@
       const done = isDone(d, t);
       const btn = document.createElement('button');
       btn.className = 'task' + (done ? ' done' : '') + (t.id === 'oz' ? ' oz' : '');
-      const sub = t.id === 'd100' && !d100HasMacros() ? 'MORE Nutrition · add calories in ⚙️ settings'
-        : t.weight && e.weight != null ? weightSub(d, e.weight) : (t.weight && isStartWeigh(d) ? 'Starting weight' : t.sub);
+      const sub = t.weight && e.weight != null ? weightSub(d, e.weight) : (t.weight && isStartWeigh(d) ? 'Starting weight' : t.sub);
       btn.innerHTML = `<span class="emoji">${t.emoji}</span><span class="txt"><b>${t.name}</b><span>${sub}</span></span><span class="check">${done ? '✓' : ''}</span>`;
       btn.onclick = () => {
         if (t.weight) { const i = $('weightInput'); i.focus(); i.select(); return; }
@@ -909,8 +908,12 @@
     'Probiotic B. lactis 10 bn CFU',
   ].join('\n');
   const d100Micros = () => (settings.d100 && settings.d100.micros) || D100_MICROS;
-  const d100HasMacros = () => !!(settings.d100 && D100_FIELDS.some(f => settings.d100[f.key]));
-  const d100Values = () => Object.fromEntries(D100_FIELDS.map(f => [f.key, (settings.d100 && settings.d100[f.key]) || 0]));
+  // Per 40 g sachet (shop listings: 1.3 g protein, 8.7 g fiber). Only the essentials are counted by default.
+  const D100_DEFAULTS = { protein: 1, fiber: 9 };
+  const d100Values = () => Object.fromEntries(D100_FIELDS.map(f => [f.key,
+    (settings.d100 && settings.d100[f.key] != null && settings.d100.custom) ? settings.d100[f.key] : (D100_DEFAULTS[f.key] || 0)]));
+  // Keep already-logged Daily100 entries in line with the current values.
+  for (const day of Object.values(data)) for (const m of (day.meals || [])) if (m.auto === 'd100') Object.assign(m, d100Values());
   function setDaily100(d, on) {
     const k = ymd(d), id = 'd100-' + k;
     data[k] = Object.assign({}, data[k], { d100: on });
@@ -926,7 +929,7 @@
 
   // Settings sheet
   function openSettings() {
-    for (const f of D100_FIELDS) $('d100_' + f.key).value = settings.d100 && settings.d100[f.key] != null ? settings.d100[f.key] : '';
+    const dv = d100Values(); for (const f of D100_FIELDS) $('d100_' + f.key).value = dv[f.key];
     $('d100Micros').value = d100Micros();
     $('setKcal').value = settings.kcal || ''; $('setProt').value = settings.prot || ''; $('setKey').value = settings.key || '';
     const sv = shakeValues(); for (const f of SHAKE_FIELDS) $('shake_' + f.key).value = sv[f.key];
@@ -939,9 +942,11 @@
     settings.prot = num($('setProt').value) || undefined;
     settings.key = $('setKey').value.trim() || undefined;
     settings.shake = Object.fromEntries(SHAKE_FIELDS.map(f => [f.key, num($('shake_' + f.key).value) ?? f.def]));
-    const d100Typed = D100_FIELDS.some(f => $('d100_' + f.key).value !== '') || $('d100Micros').value.trim() !== D100_MICROS;
-    settings.d100 = d100Typed ? Object.assign(Object.fromEntries(D100_FIELDS.map(f => [f.key, num($('d100_' + f.key).value) ?? 0])),
-      { micros: $('d100Micros').value.trim() }) : undefined;
+    const d100New = Object.fromEntries(D100_FIELDS.map(f => [f.key, num($('d100_' + f.key).value) ?? 0]));
+    const d100Changed = D100_FIELDS.some(f => d100New[f.key] !== (D100_DEFAULTS[f.key] || 0));
+    const microsTyped = $('d100Micros').value.trim();
+    settings.d100 = (d100Changed || microsTyped !== D100_MICROS)
+      ? Object.assign(d100New, { custom: d100Changed, micros: microsTyped !== D100_MICROS ? microsTyped : undefined }) : undefined;
     for (const day of Object.values(data)) for (const m of (day.meals || [])) if (m.auto === 'd100') Object.assign(m, d100Values());
     // Update shakes already logged so totals use the new label values.
     for (const day of Object.values(data)) for (const m of (day.meals || [])) if (m.auto === 'shake') Object.assign(m, shakeTotals(m.servings || 1));
