@@ -908,8 +908,8 @@
     'Probiotic B. lactis 10 bn CFU',
   ].join('\n');
   const d100Micros = () => (settings.d100 && settings.d100.micros) || D100_MICROS;
-  // Per 40 g sachet (shop listings: 1.3 g protein, 8.7 g fiber). Only the essentials are counted by default.
-  const D100_DEFAULTS = { protein: 1, fiber: 9 };
+  // Per 40 g sachet: 69 kcal (from the user), 1.3 g protein and 8.7 g fiber (shop listings).
+  const D100_DEFAULTS = { kcal: 69, protein: 1, fiber: 9 };
   const d100Values = () => Object.fromEntries(D100_FIELDS.map(f => [f.key,
     (settings.d100 && settings.d100[f.key] != null && settings.d100.custom) ? settings.d100[f.key] : (D100_DEFAULTS[f.key] || 0)]));
   // Keep already-logged Daily100 entries in line with the current values.
