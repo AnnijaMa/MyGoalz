@@ -355,6 +355,14 @@
   let data = {};
   try { data = JSON.parse(localStorage.getItem(KEY)) || {}; } catch { data = {}; }
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch {} };
+  // One-time: starting weight 78.5 kg on Wed 4 Nov (only if nothing was entered there yet).
+  try {
+    if (!localStorage.getItem('mygoalz-startweight-set')) {
+      const k0 = '2026-11-04';
+      if (!data[k0] || data[k0].weight == null) { data[k0] = Object.assign({}, data[k0], { weight: 78.5 }); save(); }
+      localStorage.setItem('mygoalz-startweight-set', '1');
+    }
+  } catch {}
 
   const allDays = [];
   for (let d = START; d <= END; d = addDays(d, 1)) allDays.push(d);
