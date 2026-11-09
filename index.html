@@ -338,7 +338,7 @@
     { id: 'oz',    emoji: '💉', name: 'Ozempic injection', sub: 'Every Wednesday', days: [3] },
     { id: 'gym',   emoji: '🏋️', name: 'Weight training',   sub: 'With trainer · Tuesday & Thursday', days: [2, 4] },
     { id: 'pil',   emoji: '🧘', name: 'Pilates',           sub: 'Every Friday', days: [5] },
-    { id: 'weigh', emoji: '⚖️', name: 'Weigh-in',          sub: 'Every Friday', days: [5], weight: true },
+    { id: 'weigh', emoji: '⚖️', name: 'Weigh-in',          sub: 'Every Friday', days: [5], dates: ['2026-11-04'], weight: true },
     { id: 'supp',  emoji: '💊', name: 'Supplements',       sub: 'Daily' },
     { id: 'shake', emoji: '🥤', name: 'Protein shake',     sub: 'Daily' },
     { id: 'move',  emoji: '🏃', name: 'Move 45 minutes',   sub: 'Days without training', minutes: true, days: [0, 1, 3, 6] },
@@ -359,7 +359,8 @@
 
   let selected = clamp(startOfToday());
 
-  const tasksFor = d => TASKS.filter(t => !t.days || t.days.includes(d.getDay()));
+  const tasksFor = d => TASKS.filter(t => !t.days || t.days.includes(d.getDay()) || (t.dates && t.dates.includes(ymd(d))));
+  const isStartWeigh = d => ymd(d) === '2026-11-04';
   const entry = d => data[ymd(d)] || {};
   const isDone = (d, t) => {
     const e = entry(d);
@@ -395,7 +396,7 @@
       const done = isDone(d, t);
       const btn = document.createElement('button');
       btn.className = 'task' + (done ? ' done' : '') + (t.id === 'oz' ? ' oz' : '');
-      const sub = t.weight && e.weight != null ? `${fmtKg(e.weight)} kg` : t.sub;
+      const sub = t.weight && e.weight != null ? `${fmtKg(e.weight)} kg` : (t.weight && isStartWeigh(d) ? 'Starting weight' : t.sub);
       btn.innerHTML = `<span class="emoji">${t.emoji}</span><span class="txt"><b>${t.name}</b><span>${sub}</span></span><span class="check">${done ? '✓' : ''}</span>`;
       btn.onclick = () => {
         if (t.weight) { const i = $('weightInput'); i.focus(); i.select(); return; }
@@ -537,7 +538,7 @@
       if (ymd(d) === ymd(selected)) cls += ' sel';
       if (ymd(d) === ymd(END)) cls += ' xmas';
       c.className = cls;
-      const mark = { 2: '🏋️', 3: '', 4: '🏋️', 5: '🧘⚖️' }[d.getDay()];
+      const mark = isStartWeigh(d) ? '⚖️' : { 2: '🏋️', 3: '', 4: '🏋️', 5: '🧘⚖️' }[d.getDay()];
       c.innerHTML = (ymd(d) === ymd(END) ? '🎄' : d.getDate()) + (d.getDay() === WED ? '<span class="dot"></span>' : '') +
         (mark ? `<span class="mk">${mark}</span>` : '');
       c.onclick = () => { selected = d; render(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
