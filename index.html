@@ -105,6 +105,8 @@
   .wrow .ch { min-width: 64px; text-align: right; color: var(--muted); }
   .wrow .ch.down { color: var(--green); font-weight: 600; }
   .wsum { font-size: 14px; margin-top: 4px; }
+  .task .txt span b { display: inline; font-size: inherit; color: var(--ink); }
+  .task .txt span b.wdown { color: var(--green); }
 
   .daydone { margin-top: 12px; text-align: center; font-weight: 700; color: var(--green); min-height: 22px; }
 
@@ -396,7 +398,7 @@
       const done = isDone(d, t);
       const btn = document.createElement('button');
       btn.className = 'task' + (done ? ' done' : '') + (t.id === 'oz' ? ' oz' : '');
-      const sub = t.weight && e.weight != null ? `${fmtKg(e.weight)} kg` : (t.weight && isStartWeigh(d) ? 'Starting weight' : t.sub);
+      const sub = t.weight && e.weight != null ? weightSub(d, e.weight) : (t.weight && isStartWeigh(d) ? 'Starting weight' : t.sub);
       btn.innerHTML = `<span class="emoji">${t.emoji}</span><span class="txt"><b>${t.name}</b><span>${sub}</span></span><span class="check">${done ? '✓' : ''}</span>`;
       btn.onclick = () => {
         if (t.weight) { const i = $('weightInput'); i.focus(); i.select(); return; }
@@ -461,6 +463,16 @@
   }
 
   const fmtKg = v => (Math.round(v * 10) / 10).toFixed(1);
+  const signKg = v => { v = Math.round(v * 10) / 10; return v > 0 ? '+' + fmtKg(v) : v < 0 ? '−' + fmtKg(-v) : '±0.0'; };
+  // "86.4 kg · −0.7 kg vs last week · −1.1 kg total" for the weigh-in task
+  function weightSub(d, w) {
+    const before = allDays.filter(x => x < d && entry(x).weight != null);
+    if (!before.length) return `${fmtKg(w)}&nbsp;kg · starting weight`;
+    const prev = entry(before[before.length - 1]).weight, first = entry(before[0]).weight;
+    let txt = `${fmtKg(w)}&nbsp;kg · <b class="${w - prev < 0 ? 'wdown' : ''}">${signKg(w - prev)}&nbsp;kg</b> vs last`;
+    if (before.length > 1) txt += ` · ${signKg(w - first)}&nbsp;kg total`;
+    return txt;
+  }
   function renderWeighins() {
     const rows = allDays.filter(d => entry(d).weight != null).map(d => ({ d, w: entry(d).weight }));
     const box = $('weighins');
