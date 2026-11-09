@@ -3,7 +3,7 @@
 A personal iPhone web app for logging daily goals from **4 Nov to 25 Dec 2026**:
 
 - 💉 Ozempic injection, every Wednesday
-- 💊 Supplements, daily
+- 💊 Supplements, daily until 8 Nov (replaced by Daily100 from 9 Nov)
 - 🥤 Protein shake, daily
 - 🍓 Daily100 (MORE Nutrition), daily – label values set in settings; adds macros and vitamins & minerals to the food summary
 - 🏋️ Weight training with trainer, Tuesday & Thursday

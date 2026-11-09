@@ -256,7 +256,7 @@
       <div class="stat"><div class="n" id="stGym">0</div><div class="l">🏋️ training sessions</div></div>
       <div class="stat"><div class="n" id="stPil">0</div><div class="l">🧘 Pilates classes</div></div>
       <div class="stat"><div class="n" id="stMove">0</div><div class="l">🏃 minutes moved</div></div>
-      <div class="stat"><div class="n" id="stSupp">0</div><div class="l">💊 supplement days</div></div>
+      <div class="stat"><div class="n" id="stSupp">0</div><div class="l">💊🍓 supplement / Daily100 days</div></div>
       <div class="stat"><div class="n" id="stShake">0</div><div class="l">🥤 protein shakes</div></div>
     </div>
     <div class="weighins" id="weighins"></div>
@@ -353,9 +353,9 @@
     { id: 'gym',   emoji: '🏋️', name: 'Weight training',   sub: 'With trainer · Tuesday & Thursday', days: [2, 4] },
     { id: 'pil',   emoji: '🧘', name: 'Pilates',           sub: 'Every Friday', days: [5] },
     { id: 'weigh', emoji: '⚖️', name: 'Weigh-in',          sub: 'Every Friday', days: [5], dates: ['2026-11-04'], weight: true },
-    { id: 'supp',  emoji: '💊', name: 'Supplements',       sub: 'Daily' },
+    { id: 'supp',  emoji: '💊', name: 'Supplements',       sub: 'Daily', until: '2026-11-08' }, // replaced by Daily100 from 9 Nov
     { id: 'shake', emoji: '🥤', name: 'Protein shake',     sub: 'Daily' },
-    { id: 'd100',  emoji: '🍓', name: 'Daily100',          sub: 'MORE Nutrition · daily' },
+    { id: 'd100',  emoji: '🍓', name: 'Daily100',          sub: 'MORE Nutrition · daily', from: '2026-11-09' },
     { id: 'move',  emoji: '🏃', name: 'Move 45 minutes',   sub: 'Days without training', minutes: true, days: [0, 1, 3, 6] },
   ];
 
@@ -382,7 +382,10 @@
 
   let selected = clamp(startOfToday());
 
-  const tasksFor = d => TASKS.filter(t => !t.days || t.days.includes(d.getDay()) || (t.dates && t.dates.includes(ymd(d))));
+  const tasksFor = d => TASKS.filter(t =>
+    (!t.until || ymd(d) <= t.until || (data[ymd(d)] && data[ymd(d)][t.id])) &&
+    (!t.from || ymd(d) >= t.from || (data[ymd(d)] && data[ymd(d)][t.id])) &&
+    (!t.days || t.days.includes(d.getDay()) || (t.dates && t.dates.includes(ymd(d)))));
   const isStartWeigh = d => ymd(d) === '2026-11-04';
   const entry = d => data[ymd(d)] || {};
   const isDone = (d, t) => {
@@ -520,7 +523,7 @@
     for (const d of allDays) {
       const e = entry(d);
       if (status(d).full && (e.supp || e.shake || e.move || e.moveMin)) perfect++;
-      if (e.supp) supp++;
+      if (e.supp || e.d100) supp++;
       if (e.shake) shake += e.shakeCount || 1;
       mins += e.moveMin || (e.move ? MOVE_GOAL : 0);
     }
