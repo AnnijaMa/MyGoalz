@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="lv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Medības</title>
+<meta name="description" content="Mednieku eksāmena jautājumi ar bildēm">
+<meta name="theme-color" content="#0f3d2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Medības">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<style>
+  :root {
+    --bg: #f4f1ea; --card: #ffffff; --ink: #1d2420; --muted: #6b736e; --line: #e4dfd4;
+    --green: #1f7a55; --green-soft: #d8efe3; --red: #b8323a; --red-soft: #f7dcdc;
+    --gold: #c9962b; --gold-soft: #f6ead0; --head: #0f3d2e; --radius: 18px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0e1412; --card: #18201d; --ink: #eef2ef; --muted: #94a19a; --line: #2a3530;
+      --green: #3bb27f; --green-soft: #173a2b; --red: #e0606a; --red-soft: #3d1d20;
+      --gold: #e2b34f; --gold-soft: #3a311b; --head: #0b2a20;
+    }
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); }
+  body {
+    font: 16px/1.4 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+    padding: env(safe-area-inset-top) 16px calc(env(safe-area-inset-bottom) + 24px);
+    max-width: 560px; margin: 0 auto;
+    -webkit-user-select: none; user-select: none;
+  }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  header { padding: 18px 2px 6px; display: flex; align-items: center; gap: 10px; min-height: 64px; }
+  h1 { font-size: 30px; margin: 0; letter-spacing: -0.02em; flex: 1; }
+  h2 { font-size: 18px; margin: 0 0 10px; }
+  .back { width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--card); font-size: 22px; flex: none; }
+  .muted { color: var(--muted); }
+  .small { font-size: 13px; }
+  .card { background: var(--card); border-radius: var(--radius); padding: 16px; margin-top: 14px; box-shadow: 0 1px 2px rgba(0,0,0,.05); }
+
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
+  .stats b { display: block; font-size: 24px; line-height: 1.1; }
+  .stats span { font-size: 12px; color: var(--muted); }
+  .bar { height: 10px; background: var(--line); border-radius: 6px; overflow: hidden; margin-top: 14px; display: flex; }
+  .bar i { display: block; height: 100%; }
+  .bar .g { background: var(--green); } .bar .y { background: var(--gold); } .bar .r { background: var(--red); }
+
+  .menu { display: grid; gap: 10px; margin-top: 14px; }
+  .item {
+    display: flex; align-items: center; gap: 14px; width: 100%; padding: 14px;
+    border-radius: 16px; border: 0; background: var(--card); text-align: left;
+    box-shadow: 0 1px 2px rgba(0,0,0,.05); transition: transform .08s;
+  }
+  .item:active { transform: scale(.98); }
+  .item .e { font-size: 28px; width: 38px; text-align: center; flex: none; }
+  .item .t { flex: 1; min-width: 0; }
+  .item .t b { display: block; }
+  .item .t span { font-size: 13px; color: var(--muted); }
+  .item .c { font-size: 13px; color: var(--muted); flex: none; }
+  .item:disabled { opacity: .45; }
+
+  .blocks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .block { border: 0; border-radius: 12px; padding: 10px 6px; background: var(--bg); text-align: center; font-size: 14px; }
+  .block b { display: block; font-size: 15px; }
+  .block .bar { height: 5px; margin-top: 6px; }
+
+  /* Quiz */
+  .qtop { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: var(--muted); font-size: 14px; }
+  .timer { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--ink); }
+  .timer.low { color: var(--red); }
+  .qbar { height: 6px; background: var(--line); border-radius: 4px; overflow: hidden; margin-top: 8px; }
+  .qbar i { display: block; height: 100%; background: var(--green); transition: width .2s; }
+  .qnum { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .qtext { font-size: 19px; font-weight: 600; line-height: 1.35; -webkit-user-select: text; user-select: text; }
+  .pics { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin-top: 12px; }
+  .pic { margin: 0; text-align: center; }
+  .pic img { width: 100%; height: 170px; object-fit: cover; border-radius: 12px; background: var(--line); display: block; }
+  .pic figcaption { font-size: 12px; color: var(--muted); margin-top: 4px; font-weight: 600; }
+  .pic.err img { display: none; }
+  .pic.err::before { content: "Bilde nav pieejama"; display: flex; align-items: center; justify-content: center; height: 170px; border-radius: 12px; background: var(--line); color: var(--muted); font-size: 13px; }
+  .opts { display: grid; gap: 10px; margin-top: 14px; }
+  .opt {
+    width: 100%; text-align: left; padding: 14px; border-radius: 14px; border: 2px solid var(--line);
+    background: var(--card); display: flex; gap: 12px; align-items: flex-start; line-height: 1.35;
+  }
+  .opt .k { flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--bg); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+  .opt.sel { border-color: var(--gold); background: var(--gold-soft); }
+  .opt.ok { border-color: var(--green); background: var(--green-soft); }
+  .opt.bad { border-color: var(--red); background: var(--red-soft); }
+  .opt.ok .k { background: var(--green); color: #fff; }
+  .opt.bad .k { background: var(--red); color: #fff; }
+  .opt:disabled { cursor: default; }
+  .feedback { margin-top: 12px; font-weight: 700; }
+  .feedback.ok { color: var(--green); } .feedback.bad { color: var(--red); }
+  .actions { display: flex; gap: 10px; margin-top: 14px; }
+  .btn { flex: 1; padding: 15px; border-radius: 14px; border: 0; background: var(--green); color: #fff; font-weight: 700; font-size: 17px; }
+  .btn.sec { background: var(--card); color: var(--ink); border: 2px solid var(--line); }
+  .btn.danger { background: var(--red); }
+  .btn:disabled { opacity: .4; }
+  .star { border: 0; background: none; font-size: 22px; padding: 0 4px; }
+
+  .dots { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; }
+  .dot { width: 26px; height: 26px; border-radius: 7px; border: 0; background: var(--bg); font-size: 11px; padding: 0; }
+  .dot.done { background: var(--gold-soft); }
+  .dot.cur { outline: 2px solid var(--gold); }
+
+  .big { font-size: 48px; font-weight: 800; text-align: center; line-height: 1; }
+  .center { text-align: center; }
+  .review { border-top: 1px solid var(--line); padding: 12px 0; }
+  .review:first-of-type { border-top: 0; }
+  .review .yours { color: var(--red); font-size: 14px; margin-top: 4px; }
+  .review .right { color: var(--green); font-size: 14px; margin-top: 2px; font-weight: 600; }
+
+  .search { width: 100%; padding: 13px 14px; border-radius: 14px; border: 2px solid var(--line); background: var(--card); color: var(--ink); font: inherit; -webkit-user-select: text; user-select: text; }
+  .seg { display: flex; background: var(--line); border-radius: 12px; padding: 3px; gap: 3px; margin-top: 10px; }
+  .seg button { flex: 1; border: 0; background: transparent; padding: 8px 4px; border-radius: 9px; font-size: 13px; }
+  .seg button.on { background: var(--card); font-weight: 700; }
+  .list .row { padding: 12px 0; border-top: 1px solid var(--line); -webkit-user-select: text; user-select: text; }
+  .list .row:first-child { border-top: 0; }
+  .list .row .a { color: var(--green); font-weight: 600; margin-top: 4px; font-size: 15px; }
+  .list .row .thumbs { display: flex; gap: 6px; margin-top: 6px; }
+  .list .row .thumbs img { width: 64px; height: 64px; object-fit: cover; border-radius: 8px; background: var(--line); }
+
+  .zoom { position: fixed; inset: 0; background: rgba(0,0,0,.92); display: none; align-items: center; justify-content: center; z-index: 50; padding: env(safe-area-inset-top) 8px env(safe-area-inset-bottom); }
+  .zoom.on { display: flex; }
+  .zoom img { max-width: 100%; max-height: 90vh; border-radius: 8px; }
+  .zoom .cap { position: absolute; bottom: calc(env(safe-area-inset-bottom) + 20px); left: 0; right: 0; text-align: center; color: #fff; font-weight: 600; }
+  .pill { display: inline-block; padding: 2px 8px; border-radius: 10px; background: var(--bg); font-size: 12px; color: var(--muted); }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="zoom" id="zoom"><img alt=""><div class="cap"></div></div>
+<script src="questions.js"></script>
+<script>
+'use strict';
+const IMG_BASE = 'https://www.xn--medbas-k8a.lv/img/';
+const IMG_CACHE = 'medibas-photos-v1';
+const EXAM_SIZE = 60, EXAM_MIN = 90, SESSION_SIZE = 20, BLOCK = 50;
+const Q = window.QUESTIONS;
+const byU = Object.fromEntries(Q.map(q => [q.u, q]));
+const TEXT = Q.filter(q => !q.i), PICS = Q.filter(q => q.i);
+
+// ---------- storage ----------
+function load(key, def) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch { return def; } }
+function save(key, v) { try { localStorage.setItem(key, JSON.stringify(v)); } catch {} }
+let P = load('medibas-progress', {});      // u -> {c, w, s(streak), l(last 1/0), t}
+let STARS = load('medibas-stars', {});     // u -> 1
+let EXAMS = load('medibas-exams', []);     // [{t, score, total, secs}]
+function record(u, ok) {
+  const p = P[u] || { c: 0, w: 0, s: 0, l: null, t: 0 };
+  if (ok) { p.c++; p.s++; } else { p.w++; p.s = 0; }
+  p.l = ok ? 1 : 0; p.t = Date.now(); P[u] = p; save('medibas-progress', P);
+}
+const status = u => { const p = P[u]; if (!p) return 'new'; if (p.l === 0) return 'wrong'; return p.s >= 2 ? 'known' : 'seen'; };
+function counts(list) {
+  const c = { new: 0, seen: 0, known: 0, wrong: 0 };
+  list.forEach(q => c[status(q.u)]++); return c;
+}
+
+// ---------- helpers ----------
+const $ = s => document.querySelector(s);
+const app = $('#app');
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+const norm = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+const LET = 'ABCDE';
+const imgUrl = f => IMG_BASE + encodeURIComponent(f);
+function bar(c, total) {
+  const pct = n => (100 * n / (total || 1)).toFixed(2) + '%';
+  return `<div class="bar"><i class="g" style="width:${pct(c.known)}"></i><i class="y" style="width:${pct(c.seen)}"></i><i class="r" style="width:${pct(c.wrong)}"></i></div>`;
+}
+function fmtTime(s) { s = Math.max(0, Math.round(s)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
+function header(title, back = true) {
+  return `<header>${back ? '<button class="back" data-go="home" aria-label="Atpakaļ">‹</button>' : ''}<h1>${title}</h1></header>`;
+}
+
+// ---------- navigation ----------
+let quiz = null, timerId = null;
+function go(screen, arg) {
+  clearInterval(timerId); timerId = null;
+  window.scrollTo(0, 0);
+  ({ home, blocks, browse, quizScreen, result, settings })[screen](arg);
+}
+app.addEventListener('click', e => {
+  const g = e.target.closest('[data-go]');
+  if (g) {
+    if (quiz && quiz.mode === 'exam' && !quiz.done && g.dataset.go === 'home' && !confirm('Pārtraukt eksāmenu? Rezultāts netiks saglabāts.')) return;
+    if (g.dataset.go === 'home') quiz = null;
+    go(g.dataset.go);
+  }
+  const s = e.target.closest('[data-start]');
+  if (s) start(s.dataset.start, s.dataset.arg);
+  const z = e.target.closest('img[data-zoom]');
+  if (z) zoom(z.src, z.dataset.zoom);
+});
+
+// ---------- home ----------
+function home() {
+  const c = counts(Q);
+  const wrong = Q.filter(q => status(q.u) === 'wrong').length;
+  const starred = Object.keys(STARS).filter(u => byU[u]).length;
+  const pc = counts(PICS);
+  const last = EXAMS[EXAMS.length - 1];
+  app.innerHTML = `
+    <header><h1>🦌 Medības</h1><button class="back" data-go="settings" aria-label="Iestatījumi">⚙︎</button></header>
+    <div class="card">
+      <div class="stats">
+        <div><b style="color:var(--green)">${c.known}</b><span>apgūti</span></div>
+        <div><b style="color:var(--gold)">${c.seen}</b><span>redzēti</span></div>
+        <div><b style="color:var(--red)">${c.wrong}</b><span>kļūdas</span></div>
+      </div>
+      ${bar(c, Q.length)}
+      <div class="small muted" style="margin-top:8px">${Q.length - c.new} no ${Q.length} jautājumiem redzēti · apgūts = 2× pēc kārtas pareizi</div>
+    </div>
+    <div class="menu">
+      <button class="item" data-start="learn"><div class="e">🎯</div><div class="t"><b>Mācīties</b><span>${SESSION_SIZE} jautājumi: vispirms kļūdas, tad jaunie</span></div></button>
+      <button class="item" data-start="exam"><div class="e">📝</div><div class="t"><b>Eksāmena simulācija</b><span>${EXAM_SIZE} jautājumi, ${EXAM_MIN} minūtes</span></div><div class="c">${last ? `pēd.: ${last.score}/${last.total}` : ''}</div></button>
+      <button class="item" data-start="pics"><div class="e">🐾</div><div class="t"><b>Bildes</b><span>Pēdas, izkārnījumi, putni</span></div><div class="c">${pc.known}/${PICS.length}</div></button>
+      <button class="item" data-start="wrong" ${wrong ? '' : 'disabled'}><div class="e">❌</div><div class="t"><b>Manas kļūdas</b><span>Atkārto tos, ko atbildēji nepareizi</span></div><div class="c">${wrong}</div></button>
+      <button class="item" data-start="stars" ${starred ? '' : 'disabled'}><div class="e">⭐</div><div class="t"><b>Atzīmētie</b><span>Jautājumi, ko atzīmēji ar zvaigznīti</span></div><div class="c">${starred}</div></button>
+      <button class="item" data-go="blocks"><div class="e">📚</div><div class="t"><b>Pa blokiem</b><span>Jautājumi pēc kārtas, pa ${BLOCK}</span></div></button>
+      <button class="item" data-go="browse"><div class="e">🔍</div><div class="t"><b>Visi jautājumi</b><span>Meklē un skaties pareizās atbildes</span></div></button>
+    </div>
+    <div class="small muted center" style="margin-top:16px" id="photoStatus"></div>`;
+  photoStatus();
+}
+
+// ---------- blocks ----------
+function blocks() {
+  const parts = [];
+  for (let i = 0; i < TEXT.length; i += BLOCK) parts.push(TEXT.slice(i, i + BLOCK));
+  app.innerHTML = header('Pa blokiem') + `<div class="card"><div class="blocks">${parts.map((p, i) => {
+    const c = counts(p);
+    return `<button class="block" data-start="block" data-arg="${i}"><b>${p[0].n}–${p[p.length - 1].n}</b><span class="small muted">${c.known}/${p.length}</span>${bar(c, p.length)}</button>`;
+  }).join('')}
+  <button class="block" data-start="pics"><b>🐾 Bildes</b><span class="small muted">${counts(PICS).known}/${PICS.length}</span>${bar(counts(PICS), PICS.length)}</button>
+  </div></div>`;
+}
+
+// ---------- browse ----------
+let browseFilter = 'all', browseText = '';
+function browse() {
+  app.innerHTML = header('Visi jautājumi') + `
+    <input class="search" id="s" type="search" placeholder="Meklēt jautājumā vai atbildē…" value="${esc(browseText)}" autocomplete="off">
+    <div class="seg" id="seg">
+      ${[['all', 'Visi'], ['wrong', 'Kļūdas'], ['new', 'Jauni'], ['stars', '⭐'], ['pics', 'Bildes']].map(([k, l]) => `<button data-f="${k}" class="${browseFilter === k ? 'on' : ''}">${l}</button>`).join('')}
+    </div>
+    <div class="small muted" style="margin-top:10px" id="cnt"></div>
+    <div class="card list" id="list"></div>`;
+  const s = $('#s');
+  s.addEventListener('input', () => { browseText = s.value; renderList(); });
+  $('#seg').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; browseFilter = b.dataset.f; browse(); });
+  renderList();
+}
+function renderList() {
+  const t = norm(browseText.trim());
+  let list = Q.filter(q => {
+    if (browseFilter === 'wrong' && status(q.u) !== 'wrong') return false;
+    if (browseFilter === 'new' && status(q.u) !== 'new') return false;
+    if (browseFilter === 'stars' && !STARS[q.u]) return false;
+    if (browseFilter === 'pics' && !q.i) return false;
+    if (!t) return true;
+    if (/^\d+$/.test(t)) return String(q.n) === t && !q.i;
+    return norm(q.q + ' ' + q.o.join(' ')).includes(t);
+  });
+  $('#cnt').textContent = `Atrasti: ${list.length}`;
+  const shown = list.slice(0, 150);
+  $('#list').innerHTML = shown.map(q => `
+    <div class="row">
+      <div><span class="pill">${q.i ? '🐾' : q.n}</span> ${esc(q.q)}</div>
+      ${q.i ? `<div class="thumbs">${q.i.map(([f, l]) => `<img loading="lazy" src="${imgUrl(f)}" data-zoom="${esc(l)}" alt="">`).join('')}</div>` : ''}
+      <div class="a">✓ ${esc(q.o[q.a])}</div>
+    </div>`).join('') + (list.length > shown.length ? `<div class="row muted small">… vēl ${list.length - shown.length}. Precizē meklēšanu.</div>` : '') || '<div class="muted">Nekas netika atrasts.</div>';
+}
+
+// ---------- quiz ----------
+function pickLearn() {
+  const wrong = Q.filter(q => status(q.u) === 'wrong').sort((a, b) => P[a.u].t - P[b.u].t);
+  const fresh = Q.filter(q => status(q.u) === 'new');
+  const seen = Q.filter(q => status(q.u) === 'seen').sort((a, b) => P[a.u].t - P[b.u].t);
+  const known = shuffle(Q.filter(q => status(q.u) === 'known'));
+  const out = wrong.slice(0, 8);
+  for (const q of fresh) { if (out.length >= SESSION_SIZE - 3) break; out.push(q); }
+  for (const q of seen.concat(known, wrong.slice(8), fresh)) { if (out.length >= SESSION_SIZE) break; if (!out.includes(q)) out.push(q); }
+  return shuffle(out);
+}
+function start(mode, arg) {
+  let list, title;
+  if (mode === 'learn') { list = pickLearn(); title = 'Mācīties'; }
+  else if (mode === 'exam') { list = shuffle(Q).slice(0, EXAM_SIZE); title = 'Eksāmens'; }
+  else if (mode === 'pics') { list = shuffle(PICS); title = 'Bildes'; }
+  else if (mode === 'wrong') { list = shuffle(Q.filter(q => status(q.u) === 'wrong')); title = 'Manas kļūdas'; }
+  else if (mode === 'stars') { list = shuffle(Q.filter(q => STARS[q.u])); title = 'Atzīmētie'; }
+  else if (mode === 'block') { const i = +arg * BLOCK; list = TEXT.slice(i, i + BLOCK); title = `${list[0].n}–${list[list.length - 1].n}`; }
+  if (!list || !list.length) return;
+  quiz = {
+    mode, title, idx: 0, done: false, startedAt: Date.now(),
+    items: list.map(q => ({ u: q.u, order: shuffle(q.o.map((_, i) => i)), pick: null })),
+  };
+  go('quizScreen');
+}
+function quizScreen() {
+  const z = quiz, it = z.items[z.idx], q = byU[it.u], exam = z.mode === 'exam';
+  const answered = it.pick !== null;
+  const reveal = answered && !exam;
+  const pics = (q.i || []).filter(p => !p[2] || reveal);
+  app.innerHTML = header(esc(z.title)) + `
+    <div class="qtop"><span>${z.idx + 1} / ${z.items.length}</span>${exam ? `<span class="timer" id="timer"></span>` : `<span>✓ ${z.items.filter(x => x.pick !== null && x.pick === byU[x.u].a).length}</span>`}</div>
+    <div class="qbar"><i style="width:${100 * (z.idx + (answered ? 1 : 0)) / z.items.length}%"></i></div>
+    <div class="card">
+      <div class="qnum" style="display:flex;justify-content:space-between;align-items:center">
+        <span>${q.i ? '🐾 Bilžu jautājums' : 'Jautājums Nr. ' + q.n}</span>
+        <button class="star" id="star" aria-label="Atzīmēt">${STARS[q.u] ? '⭐' : '☆'}</button>
+      </div>
+      <div class="qtext">${esc(q.q)}</div>
+      ${pics.length ? `<div class="pics">${pics.map(([f, l]) => `<figure class="pic"><img src="${imgUrl(f)}" data-zoom="${esc(l)}" alt="${esc(l)}" onerror="this.parentNode.classList.add('err')">${l ? `<figcaption>${esc(l)}</figcaption>` : ''}</figure>`).join('')}</div>` : ''}
+      <div class="opts" id="opts">${it.order.map((oi, k) => {
+        let cls = '';
+        if (reveal) { if (oi === q.a) cls = 'ok'; else if (oi === it.pick) cls = 'bad'; }
+        else if (exam && oi === it.pick) cls = 'sel';
+        return `<button class="opt ${cls}" data-oi="${oi}" ${reveal ? 'disabled' : ''}><span class="k">${LET[k]}</span><span>${esc(q.o[oi])}</span></button>`;
+      }).join('')}</div>
+      ${reveal ? `<div class="feedback ${it.pick === q.a ? 'ok' : 'bad'}">${it.pick === q.a ? '✓ Pareizi!' : '✗ Nepareizi'}</div>` : ''}
+    </div>
+    <div class="actions">
+      ${exam ? `<button class="btn sec" id="prev" ${z.idx ? '' : 'disabled'}>‹ Iepriekšējais</button>` : ''}
+      <button class="btn" id="next" ${!exam && !answered ? 'disabled' : ''}>${z.idx === z.items.length - 1 ? (exam ? 'Iesniegt' : 'Pabeigt') : 'Tālāk ›'}</button>
+    </div>
+    ${exam ? `<div class="card"><div class="small muted">Pārvietoties pa jautājumiem</div><div class="dots">${z.items.map((x, i) => `<button class="dot ${x.pick !== null ? 'done' : ''} ${i === z.idx ? 'cur' : ''}" data-jump="${i}">${i + 1}</button>`).join('')}</div>
+      <div class="actions"><button class="btn danger" id="submit">Iesniegt eksāmenu</button></div></div>` : ''}`;
+
+  $('#opts').addEventListener('click', e => {
+    const b = e.target.closest('.opt'); if (!b || b.disabled) return;
+    it.pick = +b.dataset.oi;
+    if (!exam) record(q.u, it.pick === q.a);
+    quizScreen();
+    if (!exam) document.querySelector('.feedback')?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  });
+  $('#star').addEventListener('click', () => {
+    if (STARS[q.u]) delete STARS[q.u]; else STARS[q.u] = 1;
+    save('medibas-stars', STARS); $('#star').textContent = STARS[q.u] ? '⭐' : '☆';
+  });
+  $('#next').addEventListener('click', () => {
+    if (z.idx < z.items.length - 1) { z.idx++; go('quizScreen'); }
+    else if (exam) submitExam(); else finish();
+  });
+  if (exam) {
+    $('#prev').addEventListener('click', () => { if (z.idx) { z.idx--; go('quizScreen'); } });
+    $('#submit').addEventListener('click', () => submitExam());
+    document.querySelector('.dots').addEventListener('click', e => { const d = e.target.closest('[data-jump]'); if (d) { z.idx = +d.dataset.jump; go('quizScreen'); } });
+    const tick = () => {
+      const left = EXAM_MIN * 60 - (Date.now() - z.startedAt) / 1000;
+      const el = $('#timer'); if (el) { el.textContent = '⏱ ' + fmtTime(left); el.classList.toggle('low', left < 300); }
+      if (left <= 0) { clearInterval(timerId); alert('Laiks beidzies!'); submitExam(true); }
+    };
+    tick(); timerId = setInterval(tick, 1000);
+  }
+}
+function submitExam(force) {
+  const z = quiz;
+  const open = z.items.filter(x => x.pick === null).length;
+  if (!force && !confirm(open ? `Neatbildēti: ${open}. Tiešām iesniegt?` : 'Iesniegt eksāmenu?')) return;
+  z.items.forEach(x => { if (x.pick !== null) record(x.u, x.pick === byU[x.u].a); });
+  const score = z.items.filter(x => x.pick === byU[x.u].a).length;
+  EXAMS.push({ t: Date.now(), score, total: z.items.length, secs: Math.round((Date.now() - z.startedAt) / 1000) });
+  save('medibas-exams', EXAMS.slice(-50));
+  finish();
+}
+function finish() { quiz.done = true; go('result'); }
+
+// ---------- result ----------
+function result() {
+  const z = quiz, exam = z.mode === 'exam';
+  const done = z.items.filter(x => x.pick !== null);
+  const right = done.filter(x => x.pick === byU[x.u].a);
+  const wrong = z.items.filter(x => x.pick !== byU[x.u].a && (exam || x.pick !== null));
+  const pct = Math.round(100 * right.length / (exam ? z.items.length : done.length || 1));
+  const hist = exam ? EXAMS.slice(-6).reverse() : [];
+  app.innerHTML = header(exam ? 'Eksāmena rezultāts' : 'Rezultāts') + `
+    <div class="card center">
+      <div class="big" style="color:${pct >= 90 ? 'var(--green)' : pct >= 75 ? 'var(--gold)' : 'var(--red)'}">${right.length}/${exam ? z.items.length : done.length}</div>
+      <div class="muted" style="margin-top:6px">${pct}% pareizi${exam ? ' · ' + fmtTime((Date.now() - z.startedAt) / 1000) + ' min' : ''}</div>
+    </div>
+    ${hist.length > 1 ? `<div class="card"><h2>Iepriekšējie eksāmeni</h2>${hist.map(h => `<div style="display:flex;justify-content:space-between;padding:4px 0"><span class="muted">${new Date(h.t).toLocaleDateString('lv-LV')} ${new Date(h.t).toLocaleTimeString('lv-LV', { hour: '2-digit', minute: '2-digit' })}</span><b>${h.score}/${h.total}</b></div>`).join('')}</div>` : ''}
+    <div class="actions">
+      ${wrong.length ? `<button class="btn" id="redo">Atkārtot kļūdas (${wrong.length})</button>` : ''}
+      <button class="btn sec" data-go="home">Uz sākumu</button>
+    </div>
+    ${wrong.length ? `<div class="card"><h2>Kļūdas</h2>${wrong.map(x => {
+      const q = byU[x.u];
+      return `<div class="review"><div><span class="pill">${q.i ? '🐾' : q.n}</span> ${esc(q.q)}</div>
+        ${q.i ? `<div class="pics">${q.i.map(([f, l]) => `<figure class="pic"><img src="${imgUrl(f)}" data-zoom="${esc(l)}" alt="" onerror="this.parentNode.classList.add('err')">${l ? `<figcaption>${esc(l)}</figcaption>` : ''}</figure>`).join('')}</div>` : ''}
+        <div class="yours">✗ ${x.pick === null ? 'Nav atbildēts' : esc(q.o[x.pick])}</div>
+        <div class="right">✓ ${esc(q.o[q.a])}</div></div>`;
+    }).join('')}</div>` : ''}`;
+  const r = $('#redo');
+  if (r) r.addEventListener('click', () => {
+    quiz = { mode: 'redo', title: 'Kļūdu atkārtošana', idx: 0, done: false, startedAt: Date.now(),
+      items: shuffle(wrong).map(x => ({ u: x.u, order: shuffle(byU[x.u].o.map((_, i) => i)), pick: null })) };
+    go('quizScreen');
+  });
+}
+
+// ---------- settings ----------
+function settings() {
+  app.innerHTML = header('Iestatījumi') + `
+    <div class="card">
+      <h2>Bildes bezsaistei</h2>
+      <div class="muted small" id="photoStatus2"></div>
+      <div class="actions"><button class="btn sec" id="dl">Lejupielādēt bildes vēlreiz</button></div>
+    </div>
+    <div class="card">
+      <h2>Par</h2>
+      <div class="small muted">${TEXT.length} VMD mednieku eksāmena jautājumi un ${PICS.length} bilžu jautājumi. Avots: medības.lv. Progress tiek glabāts tikai šajā telefonā.</div>
+    </div>
+    <div class="card">
+      <h2>Sākt no jauna</h2>
+      <div class="small muted">Izdzēš visu progresu, zvaigznītes un eksāmenu vēsturi.</div>
+      <div class="actions"><button class="btn danger" id="reset">Dzēst progresu</button></div>
+    </div>`;
+  $('#reset').addEventListener('click', () => {
+    if (!confirm('Tiešām izdzēst visu progresu?')) return;
+    P = {}; STARS = {}; EXAMS = [];
+    save('medibas-progress', P); save('medibas-stars', STARS); save('medibas-exams', EXAMS);
+    go('home');
+  });
+  $('#dl').addEventListener('click', () => downloadPhotos(true));
+  photoStatus();
+}
+
+// ---------- photos: download once, keep for offline ----------
+const ALL_PHOTOS = [...new Set(PICS.flatMap(q => q.i.map(p => p[0])))];
+let photoState = { have: null, busy: false, failed: 0 };
+function photoStatus() {
+  const n = ALL_PHOTOS.length;
+  let txt;
+  if (!('caches' in window)) txt = 'Bildes tiek ielādētas no interneta.';
+  else if (photoState.have === null) txt = '';
+  else if (photoState.busy) txt = `⬇︎ Lejupielādē bildes… ${photoState.have}/${n}`;
+  else if (photoState.have >= n) txt = `✓ Visas ${n} bildes saglabātas telefonā (darbojas bez interneta)`;
+  else txt = `Saglabātas ${photoState.have}/${n} bildes${photoState.failed ? ' · pieslēdzies internetam, lai ielādētu pārējās' : ''}`;
+  ['#photoStatus', '#photoStatus2'].forEach(s => { const el = $(s); if (el) el.textContent = txt; });
+}
+async function downloadPhotos(force) {
+  if (!('caches' in window) || photoState.busy) return;
+  const cache = await caches.open(IMG_CACHE);
+  if (force) { for (const k of await cache.keys()) await cache.delete(k); }
+  const have = new Set((await cache.keys()).map(r => r.url));
+  photoState = { have: ALL_PHOTOS.filter(f => have.has(imgUrl(f))).length, busy: true, failed: 0 };
+  photoStatus();
+  const todo = ALL_PHOTOS.filter(f => !have.has(imgUrl(f)));
+  let i = 0;
+  async function worker() {
+    while (i < todo.length) {
+      const url = imgUrl(todo[i++]);
+      try {
+        const res = await fetch(url, { mode: 'cors' });
+        if (res.ok && (res.headers.get('content-type') || '').startsWith('image/')) { await cache.put(url, res); photoState.have++; }
+        else photoState.failed++;
+      } catch { photoState.failed++; }
+      photoStatus();
+    }
+  }
+  await Promise.all([worker(), worker(), worker(), worker()]);
+  photoState.busy = false; photoStatus();
+}
+
+// ---------- zoom ----------
+function zoom(src, cap) {
+  const z = $('#zoom'); z.querySelector('img').src = src; z.querySelector('.cap').textContent = cap || '';
+  z.classList.add('on');
+}
+$('#zoom').addEventListener('click', () => $('#zoom').classList.remove('on'));
+
+// ---------- boot ----------
+go('home');
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+downloadPhotos(false);
+</script>
+</body>
+</html>
