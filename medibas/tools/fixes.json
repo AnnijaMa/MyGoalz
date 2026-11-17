@@ -1,0 +1,214 @@
+{
+  "_about": "Corrections applied on top of medības.lv data, checked against the official VMD file (jautajumi-mednieku-un-medibu-vaditaju-eksamenam_0.pdf). o = options, a = correct option text, q = question text, note = shown to the learner.",
+  "fix": {
+    "7": {
+      "o": [
+        "medību platība, uz kuru medību tiesību lietotāji ir noslēguši savstarpējus līgumus par limitēto medījamo dzīvnieku medīšanas organizēšanu blakus esošajos medību iecirkņos",
+        "vienlaidu medību platība, kuru apsaimnieko viens medību tiesību lietotājs",
+        "visa medību platība, uz kuru noslēgti medību līgumi"
+      ]
+    },
+    "10": {
+      "a": "medību procesā iegūtās medību trofejas, gaļa un subprodukti",
+      "note": "Atbilde labota (medības.lv bija: „medījamo dzīvnieku gaļa, ragi kopā ar galvaskausu (augšžokli vai pieres kaulu), ilkņi, galvaskausi un ādas”). Medību likuma definīcija; tāpat atbildēts jautājumā Nr. 11."
+    },
+    "27": {
+      "note": "VMD failā šī jautājuma teksts neatbilst atbildēm (atbildes ir no jautājuma „Medībām pielīdzināma”, Nr. 26)."
+    },
+    "42": {
+      "a": "nepieciešama Valsts meža dienesta ikreizēja atļauja",
+      "note": "Atbilde labota (medības.lv bija: „nepieciešama Dabas aizsardzības pārvaldes ikreizēja atļauja”). Medījamo dzīvnieku ievešanai vajag VMD atļauju (sk. Nr. 43); Dabas aizsardzības pārvalde izsniedz atļaujas nemedījamām sugām (Nr. 44)."
+    },
+    "106": {
+      "a": "lapsu un jenotsuņu medībās",
+      "note": "Atbilde labota (medības.lv bija: „mežacūku un staltbriežu govju medībās postījumu vietās”). Mākslīgo gaismu naktī drīkst izmantot meža cūku, lapsu un jenotsuņu medībās (sk. Nr. 107–109), nevis staltbriežu govju medībās."
+    },
+    "116": {
+      "q": "Kurš no šiem medību rīkiem ir aizliegts?"
+    },
+    "135": {
+      "a": "nav medījamais dzīvnieks",
+      "note": "Atbilde labota (medības.lv bija: „jā”). Medījami ir tikai medņu gaiļi; medņu vista nav medījamais dzīvnieks."
+    },
+    "136": {
+      "a": "nav medījamais dzīvnieks",
+      "note": "Atbilde labota (medības.lv bija: „jā”). Medījami ir tikai rubeņu gaiļi; rubeņu vista nav medījamais dzīvnieks."
+    },
+    "186": {
+      "o": [
+        "ar 22. kalibra medību šaujamieroci, kas lietojams ar gludstobra munīciju, izmantojot medību lodi",
+        "ar vītņstobra šaujamieroci, kura šāviņa enerģija stobra galā nav mazāka par 3000 džouliem, un ekspansīvas iedarbības lodi",
+        "ieroča kalibra, šāviņa enerģijas stobra galā un munīcijas ierobežojumi nav noteikti"
+      ],
+      "note": "Pirmais variants medības.lv bija iztulkots angliski; teksts atjaunots pēc VMD faila. Uzmanību: atbilde „ierobežojumi nav noteikti” ir pretrunā ar jautājumu Nr. 185 (stirnām ir munīcijas ierobežojumi) – šī atbilde nav droša."
+    },
+    "193": {
+      "note": "VMD oficiālajā failā šim jautājumam ir sajaukti atbilžu varianti (putnu saraksti no cita jautājuma). Eksāmenā varianti var atšķirties."
+    },
+    "223": {
+      "o": [
+        "baltais zaķis",
+        "lācis",
+        "āpsis"
+      ],
+      "a": "baltais zaķis",
+      "note": "VMD oficiālajā failā visi trīs varianti šim jautājumam ir „baltais zaķis” (kļūda failā). medības.lv bija pielicis „lāci” un „stirnu”, bet arī stirna neizmanto alas, tāpēc bija divas pareizas atbildes. Stirna aizstāta ar āpsi. Atceries: alas NEIZMANTO zaķi un pārnadži (arī stirna)."
+    },
+    "264": {
+      "note": "VMD oficiālajā failā visi trīs varianti šim jautājumam ir vienādi (kļūda failā). Fakts: alnim, tāpat kā visiem briežveidīgajiem, priekšzobi ir tikai apakšžoklī."
+    },
+    "275": {
+      "a": "4 gadu vecumam",
+      "note": "Atbilde labota (medības.lv bija: „2 gadu vecumam”). Tas pats jautājums Nr. 347 atbildēts ar „4 gadu vecumam”; abām atbildēm jāsakrīt."
+    },
+    "446": {
+      "o": [
+        "aprīļa otrajā pusē, maijā",
+        "februārī",
+        "martā"
+      ]
+    },
+    "453": {
+      "note": "VMD failā jautājuma teksts neatbilst atbildēm (atbildes ir putnu sugas). Iespējams, domāts: „Kurš no minētajiem putniem ir medījams?”"
+    },
+    "459": {
+      "note": "Eksāmenā pie šī jautājuma ir bilde, kuras šeit nav."
+    },
+    "460": {
+      "note": "Eksāmenā pie šī jautājuma ir bilde, kuras šeit nav."
+    },
+    "591": {
+      "a": "atļauts atsevišķos gadījumos",
+      "note": "Atbilde labota (medības.lv bija: „aizliegts”). Izņēmumi pastāv: dzinējs ir viens mednieks ar medību suni vai 1–2 mednieki ar medību vadītāja atļauju izseko ievainotu dzīvnieku (sk. Nr. 663)."
+    },
+    "594": {
+      "a": "atļauta",
+      "note": "Atbilde labota (medības.lv bija: „aizliegta”). 200 m noteikums attiecas uz šaušanu mastā. Ja dzīvnieks šķērsojis mednieku līniju, ārpus masta šaut atļauts."
+    },
+    "598": {
+      "a": "līdz 70° uz abām pusēm no perpendikula pret mednieku līniju mastā vai ārpus masta",
+      "note": "Atbilde labota (medības.lv bija: „līdz 45° uz abām pusēm no perpendikula pret mednieku līniju mastā vai ārpus masta”). Pieļaujamais leņķis ir 70° no perpendikula pret mednieku līniju (sk. Nr. 601)."
+    },
+    "608": {
+      "o": [
+        "divas stundas pēc saulrieta līdz divām stundām pirms saullēkta",
+        "pēc saviem ieskatiem",
+        "vienu stundu pēc saulrieta līdz vienai stundai pirms saullēkta"
+      ],
+      "a": "vienu stundu pēc saulrieta līdz vienai stundai pirms saullēkta",
+      "note": "Atbilde labota (medības.lv bija: „divas stundas pēc saulrieta līdz divām stundām pirms saullēkta”). Medību likums: diennakts tumšais laiks ir no vienas stundas pēc saulrieta līdz vienai stundai pirms saullēkta."
+    },
+    "609": {
+      "o": [
+        "atļautas",
+        "atļautas tikai staltbriežu buļļu medības",
+        "nav atļautas"
+      ]
+    },
+    "614": {
+      "a": "ar pielādētu medību šaujamieroci no mugurpuses",
+      "note": "Atbilde labota (medības.lv bija: „ar pielādētu medību šaujamieroci no sāniem”). Pie krituša aļņa pieiet ar pielādētu ieroci no mugurpuses (sk. Nr. 692)."
+    },
+    "615": {
+      "a": "nav noteikts",
+      "note": "Atbilde labota (medības.lv bija: „ar pielādētu medību šaujamieroci no mugurpuses”). Noteikums „no mugurpuses ar pielādētu ieroci” attiecas uz alni, staltbriedi, meža cūku, stirnu un vilku – lapsa sarakstā nav (sk. Nr. 692)."
+    },
+    "651": {
+      "o": [
+        "izlādētu",
+        "ja ierocis ir nodrošināts, tad abas atbildes ir pareizas",
+        "pielādētu"
+      ]
+    },
+    "671": {
+      "a": "pastāvīgi ieslēgtu gaismas avotu",
+      "note": "Atbilde labota (medības.lv bija: „abas atbildes ir pareizas”). Jāizmanto pastāvīgi ieslēgts gaismas avots (sk. Nr. 613), nevis nakts redzamības ierīce."
+    },
+    "676": {
+      "a": "šaut pāri cita mednieka galvai",
+      "note": "Atbilde labota (medības.lv bija: „abas atbildes ir pareizas”). Šaut uz lidojošu putnu leņķī, kas platāks par 30°, ja pārskatāmība > 150 m, ir atļauts (sk. Nr. 681), tāpēc „abas” nav pareizi."
+    },
+    "678": {
+      "a": "šaut pāri cita mednieka galvai",
+      "note": "Atbilde labota (medības.lv bija: „abas atbildes ir pareizas”). Piešaut ievainotu putnu, ja 150 m teritorija ir pārskatāma un tajā nav cilvēku, ir atļauts (sk. Nr. 632), tāpēc „abas” nav pareizi."
+    },
+    "690": {
+      "a": "atļautas meža cūku, lapsu un jenotsuņu medības, izmantojot mākslīgas gaismas avotu vai nakts redzamības vai termālo tēmēkli",
+      "note": "Atbilde labota (medības.lv bija: „medības ar ieročiem nav atļautas”). Vispārīgi medības nav atļautas, bet noteikumos ir izņēmums meža cūkām, lapsām un jenotsuņiem ar mākslīgo gaismu, nakts redzamības vai termālo tēmēkli (sk. Nr. 107–109, 691)."
+    },
+    "702": {
+      "o": [
+        "samazinātu atsitienu",
+        "palielinātu skrošu lādiņa blīvumu un lidojuma attālumu",
+        "uzlabotu ložu trāpījuma blīvumu"
+      ]
+    },
+    "807": {
+      "a": "visas darbības jāsaskaņo ar meža īpašnieku",
+      "note": "Atbilde labota (medības.lv bija: „infrastruktūras būvniecībai ar caurmēru 1,3 m augstumā mazāku par 10 cm (sausiem kokiem mazāku par 14)”). Jautājums ir par privātu mežu: tur viss jāsaskaņo ar meža īpašnieku (10 cm noteikums ir valsts mežos)."
+    },
+    "816": {
+      "a": "ragu svars un tilpums",
+      "note": "Atbilde labota (medības.lv bija: „ragu garums un izvērsums”). C.I.C. stirnāžu formulā visvairāk punktu dod ragu svars un tilpums."
+    },
+    "823": {
+      "a": "var ja izbāzeni var noņemt no sienas un grozīt",
+      "note": "Atbilde labota (medības.lv bija: „nevar”). C.I.C. aļņu ragu vērtējumā svaru un tilpumu nemēra (sk. Nr. 825), tāpēc izbāzeni var novērtēt, ja ragiem var piekļūt."
+    },
+    "827": {
+      "a": "āpšu, lapsu un bebru",
+      "note": "Atbilde labota (medības.lv bija: „āpšu, caunu un Amerikas ūdeļu”). Lapsas galvaskauss ir standarta C.I.C. trofeja; ūdrs Latvijā ir aizsargājams, caunu un ūdeļu galvaskausus nevērtē."
+    },
+    "829": {
+      "a": "patstāvīgi sameklēt un apriet zvēru vai putnu un, piesaistot tā uzmanību, aizturēt līdz mednieka pienākšanai",
+      "note": "Atbilde labota (medības.lv bija: „mednieka pavadībā sekot pa sašauta dzīvnieka asinspēdām”). Laika uzdevums ir sameklēt, apriet un aizturēt dzīvnieku; sekot asinspēdām ir asinspēdu suņa darbs."
+    },
+    "836": {
+      "o": [
+        "iespējama kuņģa samešanās",
+        "sunim nebūs medību azarta",
+        "sunim vispirms ēdiens jānopelna"
+      ]
+    },
+    "865": {
+      "o": [
+        "augumā mazāki par vidējo, apmatojums spožs, melns, ar krasi norobežotiem rūsganiem plankumiem uz galvas, krūtīm un kājām",
+        "liela auguma, apmatojums garš, melns, spožs, virs acīm, krūšu priekšpusē, zem vaigu kauliem, uz priekškājām spilgti rūsgani laukumi",
+        "spēcīgi, augumā virs vidējā, mazliet izstiepti, galva ķīlveidīga, apmatojums īss, melns ar sarkanbrūniem un dzeltenīgiem laukumiem"
+      ],
+      "a": "augumā mazāki par vidējo, apmatojums spožs, melns, ar krasi norobežotiem rūsganiem plankumiem uz galvas, krūtīm un kājām",
+      "note": "Atbilde labota (medības.lv bija: „spēcīgi, augumā virs vidējā, mazliet izstiepti, galva ķīlveidīga, apmatojums īss, melns ar sarkanbrūniem un dzeltenīgiem laukumiem”). Latvijas dzinējs ir zem vidējā auguma, melns ar krasi norobežotiem rūsganiem iedegumiem."
+    },
+    "868": {
+      "a": "abi pārējie varianti ir pareizi",
+      "note": "Atbilde labota (medības.lv bija: „individuālajās medībās šķirnes medību suni atļauts izmantot dzīvnieka sugai noteiktajā dzinējmedību periodā”). Individuālajās medībās suni drīkst izmantot dzinējmedību periodā, bet ievainota dzīvnieka meklēšanai – visā medību termiņā."
+    },
+    "891": {
+      "a": "lielais medījamais dzīvnieks",
+      "note": "Atbilde labota (medības.lv bija: „mazais medījamais dzīvnieks”). ES regulā 853/2004 mazie medījamie dzīvnieki ir tikai putni un zaķveidīgie; bebrs pārtikas apritē ir lielais medījamais dzīvnieks."
+    },
+    "894": {
+      "a": "vidēja vecuma staltbriežu buļļi",
+      "note": "Atbilde labota (medības.lv bija: „veci staltbriežu buļļi”). Veci buļļi bauro rupjāk un mazāk intensīvi (sk. Nr. 898)."
+    },
+    "924": {
+      "a": "lapsas, Amerikas ūdeles, baibakus, jenotsuņus, ondatras, bebrus",
+      "note": "Atbilde labota (medības.lv bija: „Amerikas ūdeles, jenotsuņus, ūdrus, bebrus, lapsas, āpšus, seskus”). Ūdrs ir aizsargājama suga, meža cūkas ar medību rīkiem nemedī."
+    }
+  },
+  "add": [
+    {
+      "n": 966,
+      "after": 219,
+      "q": "Kādām pazīmēm jāpievērš uzmanība, lai atšķirtu meža un akmeņu caunas?",
+      "o": [
+        "apmatojuma krāsai",
+        "astes garumam",
+        "krūšu plankuma formai un pēdu apmatojumam"
+      ],
+      "a": "krūšu plankuma formai un pēdu apmatojumam",
+      "sec": "Medījamo dzīvnieku bioloģija,anatomija, fizioloģija, uzvedība un slimības",
+      "note": "Šī jautājuma medības.lv nebija; pievienots no VMD faila. Meža caunai krūšu plankums dzeltenīgs un noapaļots, pēdas apmatotas; akmeņu caunai plankums balts, dakšveida."
+    }
+  ]
+}
