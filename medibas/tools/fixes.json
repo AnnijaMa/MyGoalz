@@ -1,0 +1,18 @@
+{
+  "_about": "Corrections applied on top of medības.lv data, checked against the official VMD file (jautajumi-mednieku-un-medibu-vaditaju-eksamenam_0.pdf). o = options, a = correct option text, q = question text, note = shown to the learner.",
+  "fix": {
+    "7": { "o": ["medību platība, uz kuru medību tiesību lietotāji ir noslēguši savstarpējus līgumus par limitēto medījamo dzīvnieku medīšanas organizēšanu blakus esošajos medību iecirkņos", "vienlaidu medību platība, kuru apsaimnieko viens medību tiesību lietotājs", "visa medību platība, uz kuru noslēgti medību līgumi"] },
+    "116": { "q": "Kurš no šiem medību rīkiem ir aizliegts?" },
+    "186": { "o": ["ar 22. kalibra medību šaujamieroci, kas lietojams ar gludstobra munīciju, izmantojot medību lodi", "ar vītņstobra šaujamieroci, kura šāviņa enerģija stobra galā nav mazāka par 3000 džouliem, un ekspansīvas iedarbības lodi", "ieroča kalibra, šāviņa enerģijas stobra galā un munīcijas ierobežojumi nav noteikti"], "note": "Pirmais variants medības.lv bija iztulkots angliski; teksts atjaunots pēc VMD faila." },
+    "193": { "note": "VMD oficiālajā failā šim jautājumam ir sajaukti atbilžu varianti (putnu saraksti no cita jautājuma). Eksāmenā varianti var atšķirties." },
+    "223": { "o": ["baltais zaķis", "lācis", "āpsis"], "a": "baltais zaķis", "note": "VMD oficiālajā failā visi trīs varianti šim jautājumam ir „baltais zaķis” (kļūda failā). medības.lv bija pielicis „lāci” un „stirnu”, bet arī stirna neizmanto alas, tāpēc bija divas pareizas atbildes. Stirna aizstāta ar āpsi. Atceries: alas NEIZMANTO zaķi un pārnadži (arī stirna)." },
+    "264": { "note": "VMD oficiālajā failā visi trīs varianti šim jautājumam ir vienādi (kļūda failā). Fakts: alnim, tāpat kā visiem briežveidīgajiem, priekšzobi ir tikai apakšžoklī." },
+    "446": { "o": ["aprīļa otrajā pusē, maijā", "februārī", "martā"] },
+    "702": { "o": ["samazinātu atsitienu", "palielinātu skrošu lādiņa blīvumu un lidojuma attālumu", "uzlabotu ložu trāpījuma blīvumu"] },
+    "836": { "o": ["iespējama kuņģa samešanās", "sunim nebūs medību azarta", "sunim vispirms ēdiens jānopelna"] },
+    "865": { "o": ["augumā mazāki par vidējo, apmatojums spožs, melns, ar krasi norobežotiem rūsganiem plankumiem uz galvas, krūtīm un kājām", "liela auguma, apmatojums garš, melns, spožs, virs acīm, krūšu priekšpusē, zem vaigu kauliem, uz priekškājām spilgti rūsgani laukumi", "spēcīgi, augumā virs vidējā, mazliet izstiepti, galva ķīlveidīga, apmatojums īss, melns ar sarkanbrūniem un dzeltenīgiem laukumiem"] }
+  },
+  "add": [
+    { "n": 966, "after": 219, "q": "Kādām pazīmēm jāpievērš uzmanība, lai atšķirtu meža un akmeņu caunas?", "o": ["apmatojuma krāsai", "astes garumam", "krūšu plankuma formai un pēdu apmatojumam"], "a": "krūšu plankuma formai un pēdu apmatojumam", "sec": "Medījamo dzīvnieku bioloģija,anatomija, fizioloģija, uzvedība un slimības", "note": "Šī jautājuma medības.lv nebija; pievienots no VMD faila. Meža caunai krūšu plankums dzeltenīgs un noapaļots, pēdas apmatotas; akmeņu caunai plankums balts, dakšveida." }
+  ]
+}

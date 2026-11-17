@@ -98,6 +98,8 @@
   .opt.bad .k { background: var(--red); color: #fff; }
   .opt:disabled { cursor: default; }
   .feedback { margin-top: 12px; font-weight: 700; }
+  .note { margin-top: 10px; padding: 10px 12px; border-radius: 12px; background: var(--gold-soft); font-size: 14px; line-height: 1.4; overflow-wrap: anywhere; }
+  .note b { display: block; margin-bottom: 2px; }
   .feedback.ok { color: var(--green); } .feedback.bad { color: var(--red); }
   .actions { display: flex; gap: 10px; margin-top: 14px; }
   .btn { flex: 1; padding: 15px; border-radius: 14px; border: 0; background: var(--green); color: #fff; font-weight: 700; font-size: 17px; }
@@ -148,6 +150,13 @@ const EXAM_SIZE = 60, EXAM_MIN = 90, SESSION_SIZE = 20, BLOCK = 50;
 const Q = window.QUESTIONS;
 const byU = Object.fromEntries(Q.map(q => [q.u, q]));
 const TEXT = Q.filter(q => !q.i), PICS = Q.filter(q => q.i);
+const SECTIONS = window.SECTIONS || [];
+const TOPIC = [ // short names + emoji for the official VMD topics, by index
+  ['⚖️', 'Medību likumi un noteikumi'], ['🦌', 'Dzīvnieku bioloģija un uzvedība'], ['🦠', 'Slimības'],
+  ['📊', 'Populāciju apsaimniekošana'], ['🦺', 'Drošība medībās'], ['🔫', 'Ieroči, munīcija, ballistika'],
+  ['📜', 'Ieroču aprites noteikumi'], ['🪤', 'Atļautie medību rīki'], ['🪜', 'Medību infrastruktūra'],
+  ['🏆', 'Trofejas un vērtēšana'], ['🐕', 'Medību suņi'], ['🔪', 'Apstrāde un higiēna'], ['🌲', 'Medību veidi, ētika']];
+const noteHtml = q => q.x ? `<div class="note"><b>⚠️ Piezīme</b>${esc(q.x)}</div>` : '';
 
 // ---------- storage ----------
 function load(key, def) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch { return def; } }
@@ -197,7 +206,7 @@ function go(screen, arg) {
   clearInterval(timerId); timerId = null;
   resetZoom();
   window.scrollTo(0, 0);
-  ({ home, blocks, browse, quizScreen, result, settings })[screen](arg);
+  ({ home, blocks, topics, browse, quizScreen, result, settings })[screen](arg);
 }
 app.addEventListener('click', e => {
   const g = e.target.closest('[data-go]');
@@ -236,6 +245,7 @@ function home() {
       <button class="item" data-start="pics"><div class="e">🐾</div><div class="t"><b>Bildes</b><span>Pēdas, izkārnījumi, putni</span></div><div class="c">${pc.known}/${PICS.length}</div></button>
       <button class="item" data-start="wrong" ${wrong ? '' : 'disabled'}><div class="e">❌</div><div class="t"><b>Manas kļūdas</b><span>Atkārto tos, ko atbildēji nepareizi</span></div><div class="c">${wrong}</div></button>
       <button class="item" data-start="stars" ${starred ? '' : 'disabled'}><div class="e">⭐</div><div class="t"><b>Atzīmētie</b><span>Jautājumi, ko atzīmēji ar zvaigznīti</span></div><div class="c">${starred}</div></button>
+      <button class="item" data-go="topics"><div class="e">📂</div><div class="t"><b>Pa tēmām</b><span>13 VMD eksāmena tēmas</span></div></button>
       <button class="item" data-go="blocks"><div class="e">📚</div><div class="t"><b>Pa blokiem</b><span>Jautājumi pēc kārtas, pa ${BLOCK}</span></div></button>
       <button class="item" data-go="browse"><div class="e">🔍</div><div class="t"><b>Visi jautājumi</b><span>Meklē un skaties pareizās atbildes</span></div></button>
     </div>
@@ -255,13 +265,21 @@ function blocks() {
   </div></div>`;
 }
 
+// ---------- topics ----------
+function topics() {
+  app.innerHTML = header('Pa tēmām') + `<div class="menu">${SECTIONS.map((_, i) => {
+    const list = TEXT.filter(q => q.s === i), c = counts(list), [e, name] = TOPIC[i] || ['📁', SECTIONS[i]];
+    return `<button class="item" data-start="topic" data-arg="${i}"><div class="e">${e}</div><div class="t"><b>${esc(name)}</b><span>${c.known} no ${list.length} apgūti</span>${bar(c, list.length)}</div></button>`;
+  }).join('')}</div>`;
+}
+
 // ---------- browse ----------
 let browseFilter = 'all', browseText = '';
 function browse() {
   app.innerHTML = header('Visi jautājumi') + `
     <input class="search" id="s" type="search" placeholder="Meklēt jautājumā vai atbildē…" value="${esc(browseText)}" autocomplete="off">
     <div class="seg" id="seg">
-      ${[['all', 'Visi'], ['wrong', 'Kļūdas'], ['new', 'Jauni'], ['stars', '⭐'], ['pics', 'Bildes']].map(([k, l]) => `<button data-f="${k}" class="${browseFilter === k ? 'on' : ''}">${l}</button>`).join('')}
+      ${[['all', 'Visi'], ['wrong', 'Kļūdas'], ['new', 'Jauni'], ['stars', '⭐'], ['pics', 'Bildes'], ['fixed', '⚠️']].map(([k, l]) => `<button data-f="${k}" class="${browseFilter === k ? 'on' : ''}">${l}</button>`).join('')}
     </div>
     <div class="small muted" style="margin-top:10px" id="cnt"></div>
     <div class="card list" id="list"></div>`;
@@ -277,6 +295,7 @@ function renderList() {
     if (browseFilter === 'new' && status(q.u) !== 'new') return false;
     if (browseFilter === 'stars' && !STARS[q.u]) return false;
     if (browseFilter === 'pics' && !q.i) return false;
+    if (browseFilter === 'fixed' && !q.x) return false;
     if (!t) return true;
     if (/^\d+$/.test(t)) return String(q.n) === t && !q.i;
     return norm(q.q + ' ' + q.o.join(' ')).includes(t);
@@ -287,16 +306,17 @@ function renderList() {
     <div class="row">
       <div><span class="pill">${q.i ? '🐾' : q.n}</span> ${esc(q.q)}</div>
       ${q.i ? `<div class="thumbs">${q.i.map(([f, l]) => `<img loading="lazy" src="${imgUrl(f)}" data-zoom="${esc(l)}" alt="">`).join('')}</div>` : ''}
-      <div class="a">✓ ${esc(q.o[q.a])}</div>
+      <div class="a">✓ ${esc(q.o[q.a])}</div>${noteHtml(q)}
     </div>`).join('') + (list.length > shown.length ? `<div class="row muted small">… vēl ${list.length - shown.length}. Precizē meklēšanu.</div>` : '') || '<div class="muted">Nekas netika atrasts.</div>';
 }
 
 // ---------- quiz ----------
-function pickLearn() {
-  const wrong = Q.filter(q => status(q.u) === 'wrong').sort((a, b) => P[a.u].t - P[b.u].t);
-  const fresh = Q.filter(q => status(q.u) === 'new');
-  const seen = Q.filter(q => status(q.u) === 'seen').sort((a, b) => P[a.u].t - P[b.u].t);
-  const known = shuffle(Q.filter(q => status(q.u) === 'known'));
+function pickLearn(pool = Q) {
+  const Q_ = pool;
+  const wrong = Q_.filter(q => status(q.u) === 'wrong').sort((a, b) => P[a.u].t - P[b.u].t);
+  const fresh = Q_.filter(q => status(q.u) === 'new');
+  const seen = Q_.filter(q => status(q.u) === 'seen').sort((a, b) => P[a.u].t - P[b.u].t);
+  const known = shuffle(Q_.filter(q => status(q.u) === 'known'));
   const out = wrong.slice(0, 8);
   for (const q of fresh) { if (out.length >= SESSION_SIZE - 3) break; out.push(q); }
   for (const q of seen.concat(known, wrong.slice(8), fresh)) { if (out.length >= SESSION_SIZE) break; if (!out.includes(q)) out.push(q); }
@@ -309,6 +329,7 @@ function start(mode, arg) {
   else if (mode === 'pics') { list = shuffle(PICS); title = 'Bildes'; }
   else if (mode === 'wrong') { list = shuffle(Q.filter(q => status(q.u) === 'wrong')); title = 'Manas kļūdas'; }
   else if (mode === 'stars') { list = shuffle(Q.filter(q => STARS[q.u])); title = 'Atzīmētie'; }
+  else if (mode === 'topic') { list = pickLearn(TEXT.filter(q => q.s === +arg)); title = (TOPIC[+arg] || ['', 'Tēma'])[1]; }
   else if (mode === 'block') { const i = +arg * BLOCK; list = TEXT.slice(i, i + BLOCK); title = `${list[0].n}–${list[list.length - 1].n}`; }
   if (!list || !list.length) return;
   quiz = {
@@ -327,7 +348,7 @@ function quizScreen() {
     <div class="qbar"><i style="width:${100 * (z.idx + (answered ? 1 : 0)) / z.items.length}%"></i></div>
     <div class="card">
       <div class="qnum" style="display:flex;justify-content:space-between;align-items:center">
-        <span>${q.i ? '🐾 Bilžu jautājums' : 'Jautājums Nr. ' + q.n}</span>
+        <span>${q.i ? '🐾 Bilžu jautājums' : 'Jautājums Nr. ' + q.n}${q.s != null && TOPIC[q.s] ? ' · ' + TOPIC[q.s][0] : ''}</span>
         <button class="star" id="star" aria-label="Atzīmēt">${STARS[q.u] ? '⭐' : '☆'}</button>
       </div>
       <div class="qtext">${esc(q.q)}</div>
@@ -338,7 +359,7 @@ function quizScreen() {
         else if (exam && oi === it.pick) cls = 'sel';
         return `<button class="opt ${cls}" data-oi="${oi}" ${reveal ? 'disabled' : ''}><span class="k">${LET[k]}</span><span>${esc(q.o[oi])}</span></button>`;
       }).join('')}</div>
-      ${reveal ? `<div class="feedback ${it.pick === q.a ? 'ok' : 'bad'}">${it.pick === q.a ? '✓ Pareizi!' : '✗ Nepareizi'}</div>` : ''}
+      ${reveal ? `<div class="feedback ${it.pick === q.a ? 'ok' : 'bad'}">${it.pick === q.a ? '✓ Pareizi!' : '✗ Nepareizi'}</div>${noteHtml(q)}` : ''}
     </div>
     <div class="actions">
       ${exam ? `<button class="btn sec" id="prev" ${z.idx ? '' : 'disabled'}>‹ Iepriekšējais</button>` : ''}
@@ -409,7 +430,7 @@ function result() {
       return `<div class="review"><div><span class="pill">${q.i ? '🐾' : q.n}</span> ${esc(q.q)}</div>
         ${q.i ? `<div class="pics">${q.i.map(([f, l]) => `<figure class="pic"><img src="${imgUrl(f)}" data-zoom="${esc(l)}" alt="" onerror="this.parentNode.classList.add('err')">${l ? `<figcaption>${esc(l)}</figcaption>` : ''}</figure>`).join('')}</div>` : ''}
         <div class="yours">✗ ${x.pick === null ? 'Nav atbildēts' : esc(q.o[x.pick])}</div>
-        <div class="right">✓ ${esc(q.o[q.a])}</div></div>`;
+        <div class="right">✓ ${esc(q.o[q.a])}</div>${noteHtml(q)}</div>`;
     }).join('')}</div>` : ''}`;
   const r = $('#redo');
   if (r) r.addEventListener('click', () => {
@@ -429,7 +450,7 @@ function settings() {
     </div>
     <div class="card">
       <h2>Par</h2>
-      <div class="small muted">${TEXT.length} VMD mednieku eksāmena jautājumi un ${PICS.length} bilžu jautājumi. Avots: medības.lv. Progress tiek glabāts tikai šajā telefonā.</div>
+      <div class="small muted">${TEXT.length} VMD mednieku eksāmena jautājumi un ${PICS.length} bilžu jautājumi. Avots: medības.lv, salīdzināts ar VMD oficiālo jautājumu failu. VMD failā nav pareizo atbilžu, tāpēc atbildes ir medības.lv un pārbaudītas; labotie jautājumi atzīmēti ar ⚠️. Progress tiek glabāts tikai šajā telefonā.</div>
     </div>
     <div class="card">
       <h2>Sākt no jauna</h2>

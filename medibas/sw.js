@@ -1,4 +1,4 @@
-const CACHE = 'medibas-v2';
+const CACHE = 'medibas-v3';
 const IMG_CACHE = 'medibas-photos-v1';
 const IMG_HOST = 'www.xn--medbas-k8a.lv';
 const ASSETS = ['./', 'index.html', 'questions.js', 'manifest.json', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
