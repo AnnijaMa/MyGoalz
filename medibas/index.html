@@ -2,7 +2,7 @@
 <html lang="lv">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" id="vp" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>Medības</title>
 <meta name="description" content="Mednieku eksāmena jautājumi ar bildēm">
 <meta name="theme-color" content="#0f3d2e">
@@ -27,7 +27,9 @@
     }
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { margin: 0; background: var(--bg); color: var(--ink); }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); overflow-x: hidden; max-width: 100%; touch-action: manipulation; -webkit-text-size-adjust: 100%; }
+  #app, .card, .opts, .opt, .qtext, .actions, header, h1 { min-width: 0; max-width: 100%; }
+  .qtext, .opt span, h1, .review, .list .row { overflow-wrap: anywhere; }
   body {
     font: 16px/1.4 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
     padding: env(safe-area-inset-top) 16px calc(env(safe-area-inset-bottom) + 24px);
@@ -183,8 +185,17 @@ function header(title, back = true) {
 
 // ---------- navigation ----------
 let quiz = null, timerId = null;
+function resetZoom() {
+  // If iOS zoomed in (double tap / pinch), snap back to normal size.
+  if (window.visualViewport && Math.abs(visualViewport.scale - 1) > 0.01) {
+    const vp = document.getElementById('vp'), c = vp.content;
+    vp.content = c + ', minimum-scale=1';
+    setTimeout(() => { vp.content = c; }, 300);
+  }
+}
 function go(screen, arg) {
   clearInterval(timerId); timerId = null;
+  resetZoom();
   window.scrollTo(0, 0);
   ({ home, blocks, browse, quizScreen, result, settings })[screen](arg);
 }
