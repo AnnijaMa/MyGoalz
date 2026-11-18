@@ -182,7 +182,9 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;'
 function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
 const norm = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 const LET = 'ABCDE';
-const imgUrl = f => IMG_BASE + encodeURIComponent(f);
+// Photos are either medības.lv files or 'w:<English Wikipedia article>' (lead photo, resolved on the phone).
+let WIKI = load('medibas-wiki', {});
+const imgUrl = f => f.startsWith('w:') ? (WIKI[f.slice(2)] || '') : IMG_BASE + encodeURIComponent(f);
 function bar(c, total) {
   const pct = n => (100 * n / (total || 1)).toFixed(2) + '%';
   return `<div class="bar"><i class="g" style="width:${pct(c.known)}"></i><i class="y" style="width:${pct(c.seen)}"></i><i class="r" style="width:${pct(c.wrong)}"></i></div>`;
@@ -242,7 +244,7 @@ function home() {
     <div class="menu">
       <button class="item" data-start="learn"><div class="e">🎯</div><div class="t"><b>Mācīties</b><span>${SESSION_SIZE} jautājumi: vispirms kļūdas, tad jaunie</span></div></button>
       <button class="item" data-start="exam"><div class="e">📝</div><div class="t"><b>Eksāmena simulācija</b><span>${EXAM_SIZE} jautājumi, ${EXAM_MIN} minūtes</span></div><div class="c">${last ? `pēd.: ${last.score}/${last.total}` : ''}</div></button>
-      <button class="item" data-start="pics"><div class="e">🐾</div><div class="t"><b>Bildes</b><span>Pēdas, izkārnījumi, putni</span></div><div class="c">${pc.known}/${PICS.length}</div></button>
+      <button class="item" data-start="pics"><div class="e">🐾</div><div class="t"><b>Bildes</b><span>Putni, pēdas un izkārnījumi, suņi</span></div><div class="c">${pc.known}/${PICS.length}</div></button>
       <button class="item" data-start="wrong" ${wrong ? '' : 'disabled'}><div class="e">❌</div><div class="t"><b>Manas kļūdas</b><span>Atkārto tos, ko atbildēji nepareizi</span></div><div class="c">${wrong}</div></button>
       <button class="item" data-start="stars" ${starred ? '' : 'disabled'}><div class="e">⭐</div><div class="t"><b>Atzīmētie</b><span>Jautājumi, ko atzīmēji ar zvaigznīti</span></div><div class="c">${starred}</div></button>
       <button class="item" data-go="topics"><div class="e">📂</div><div class="t"><b>Pa tēmām</b><span>13 VMD eksāmena tēmas</span></div></button>
@@ -468,7 +470,27 @@ function settings() {
 }
 
 // ---------- photos: download once, keep for offline ----------
-const ALL_PHOTOS = [...new Set(PICS.flatMap(q => q.i.map(p => p[0])))];
+const PHOTO_KEYS = [...new Set(PICS.flatMap(q => q.i.map(p => p[0])))];
+let ALL_PHOTOS = PHOTO_KEYS.filter(f => imgUrl(f));
+async function resolveWiki() {
+  const titles = PHOTO_KEYS.filter(f => f.startsWith('w:') && !WIKI[f.slice(2)]).map(f => f.slice(2));
+  if (!titles.length) return;
+  try {
+    const url = 'https://en.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&origin=*&redirects=1' +
+      '&prop=pageimages&piprop=thumbnail&pithumbsize=960&titles=' + encodeURIComponent(titles.join('|'));
+    const d = await (await fetch(url)).json();
+    const qy = d.query || {}, alias = {};
+    (qy.normalized || []).concat(qy.redirects || []).forEach(x => { alias[x.to] = (alias[x.to] || []).concat(x.from, alias[x.from] || []); });
+    (qy.pages || []).forEach(pg => {
+      if (!pg.thumbnail) return;
+      [pg.title].concat(alias[pg.title] || []).forEach(t => { if (titles.includes(t)) WIKI[t] = pg.thumbnail.source; });
+    });
+    save('medibas-wiki', WIKI);
+    ALL_PHOTOS = PHOTO_KEYS.filter(f => imgUrl(f));
+    const it = quiz && !quiz.done && quiz.items[quiz.idx];
+    if (it && (byU[it.u].i || []).some(p => p[0].startsWith('w:'))) go('quizScreen');
+  } catch {}
+}
 let photoState = { have: null, busy: false, failed: 0 };
 function photoStatus() {
   const n = ALL_PHOTOS.length;
@@ -514,7 +536,7 @@ $('#zoom').addEventListener('click', () => $('#zoom').classList.remove('on'));
 // ---------- boot ----------
 go('home');
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
-downloadPhotos(false);
+resolveWiki().finally(() => downloadPhotos(false));
 </script>
 </body>
 </html>

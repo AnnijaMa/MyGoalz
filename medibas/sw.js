@@ -1,6 +1,6 @@
-const CACHE = 'medibas-v4';
+const CACHE = 'medibas-v5';
 const IMG_CACHE = 'medibas-photos-v1';
-const IMG_HOST = 'www.xn--medbas-k8a.lv';
+const IMG_HOSTS = ['www.xn--medbas-k8a.lv', 'upload.wikimedia.org'];
 const ASSETS = ['./', 'index.html', 'questions.js', 'manifest.json', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', e => {
@@ -15,7 +15,7 @@ self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   const url = new URL(e.request.url);
   // Exam photos: keep a copy on the phone, serve it from there (works offline).
-  if (url.host === IMG_HOST) {
+  if (IMG_HOSTS.includes(url.host)) {
     e.respondWith(caches.open(IMG_CACHE).then(async c => {
       const hit = await c.match(url.href);
       if (hit) return hit;
