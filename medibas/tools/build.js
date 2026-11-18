@@ -44,7 +44,35 @@ for (const x of fixes.add) {
   const at = out.findIndex(q => q.u === 'q' + x.after);
   out.splice(at + 1, 0, o);
 }
-const pics = out.filter(q => q.i), text = out.filter(q => !q.i);
+// Picture questions: rebuilt from the official VMD option sets (idgroups.json),
+// replacing medības.lv's own picture questions but reusing their photos.
+const ID = JSON.parse(fs.readFileSync(path.join(__dirname, 'idgroups.json'), 'utf8'));
+const noSexLabel = new Set(['raķelis', 'sējas zoss', 'baltpieres zoss', 'Kanādas zoss', 'baltvaigu zoss', 'laucis', 'lauku balodis', 'mājas balodis', 'meža balodis', 'tumšā pīle', 'mežirbe', 'laukirbe']);
+const photos = key => {
+  const list = ID.species[key];
+  if (!list) return null;
+  const res = [];
+  list.forEach((f, k) => {
+    const m = /^([PMR]):(.+)$/.exec(f);
+    if (m) {
+      const file = m[2] + ({ P: '_p.jpg', M: '_m.jpg', R: '_reals.jpg' })[m[1]];
+      if (missing.has(file)) return;
+      res.push(m[1] === 'R' ? [file, 'Dzīvnieks', 1] : [file, m[1] === 'P' ? 'Pēdas' : 'Izkārnījumi']);
+    } else if (f.startsWith('w:')) res.push([f, 'Foto: Wikipedia']);
+    else if (!missing.has(f)) res.push([f, list.length > 1 && !noSexLabel.has(key) ? (k ? 'Mātīte ♀' : 'Tēviņš ♂') : '']);
+  });
+  return res.length ? res : null;
+};
+const genPics = [];
+ID.groups.forEach((g, gi) => {
+  g.o.forEach((label, a) => {
+    const key = g.t ? g.t[label] : label;
+    const i = key && photos(key);
+    if (!i) return;
+    genPics.push({ u: 'v' + gi + '_' + a, n: 2000 + genPics.length, q: g.q, o: g.o, a, i });
+  });
+});
+const text = out.filter(q => !q.i), pics = genPics;
 const all = text.concat(pics);
 if (new Set(all.map(q => q.u)).size !== all.length) throw new Error('duplicate ids');
 fs.writeFileSync(process.argv[3],
