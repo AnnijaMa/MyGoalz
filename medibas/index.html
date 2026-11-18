@@ -227,6 +227,7 @@ app.addEventListener('click', e => {
 function home() {
   const c = counts(Q);
   const wrong = Q.filter(q => status(q.u) === 'wrong').length;
+  const unseen = Q.filter(q => status(q.u) === 'new').length;
   const starred = Object.keys(STARS).filter(u => byU[u]).length;
   const pc = counts(PICS);
   const last = EXAMS[EXAMS.length - 1];
@@ -242,6 +243,7 @@ function home() {
       <div class="small muted" style="margin-top:8px">${Q.length - c.new} no ${Q.length} jautājumiem redzēti · apgūts = 2× pēc kārtas pareizi</div>
     </div>
     <div class="menu">
+      <button class="item" data-start="new" ${unseen ? '' : 'disabled'}><div class="e">🆕</div><div class="t"><b>Neredzētie jautājumi</b><span>${SESSION_SIZE} vēl neredzēti jautājumi pēc nejaušības</span></div><div class="c">${unseen}</div></button>
       <button class="item" data-start="learn"><div class="e">🎯</div><div class="t"><b>Mācīties</b><span>${SESSION_SIZE} jautājumi: vispirms kļūdas, tad jaunie</span></div></button>
       <button class="item" data-start="exam"><div class="e">📝</div><div class="t"><b>Eksāmena simulācija</b><span>${EXAM_SIZE} jautājumi, ${EXAM_MIN} minūtes</span></div><div class="c">${last ? `pēd.: ${last.score}/${last.total}` : ''}</div></button>
       <button class="item" data-start="pics"><div class="e">🐾</div><div class="t"><b>Bildes</b><span>Putni, pēdas un izkārnījumi, suņi</span></div><div class="c">${pc.known}/${PICS.length}</div></button>
@@ -329,6 +331,7 @@ function start(mode, arg) {
   if (mode === 'learn') { list = pickLearn(); title = 'Mācīties'; }
   else if (mode === 'exam') { list = shuffle(Q).slice(0, EXAM_SIZE); title = 'Eksāmens'; }
   else if (mode === 'pics') { list = shuffle(PICS); title = 'Bildes'; }
+  else if (mode === 'new') { list = shuffle(Q.filter(q => status(q.u) === 'new')).slice(0, SESSION_SIZE); title = 'Neredzētie'; }
   else if (mode === 'wrong') { list = shuffle(Q.filter(q => status(q.u) === 'wrong')); title = 'Manas kļūdas'; }
   else if (mode === 'stars') { list = shuffle(Q.filter(q => STARS[q.u])); title = 'Atzīmētie'; }
   else if (mode === 'topic') { list = pickLearn(TEXT.filter(q => q.s === +arg)); title = (TOPIC[+arg] || ['', 'Tēma'])[1]; }
