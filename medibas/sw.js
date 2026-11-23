@@ -1,4 +1,4 @@
-const CACHE = 'medibas-v12';
+const CACHE = 'medibas-v13';
 const IMG_CACHE = 'medibas-photos-v1';
 const IMG_HOSTS = ['www.xn--medbas-k8a.lv', 'upload.wikimedia.org'];
 const ASSETS = ['./', 'index.html', 'questions.js', 'manifest.json', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
