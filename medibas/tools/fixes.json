@@ -75,7 +75,8 @@
       "note": "Eksāmenā pie šī jautājuma ir bilde, kuras šeit nav."
     },
     "460": {
-      "note": "Eksāmenā pie šī jautājuma ir bilde, kuras šeit nav."
+      "note": "Atbilde labota pēc taurs.lv eksāmena testa (medības.lv bija: „pa labi”). Eksāmenā pie šī jautājuma ir bilde: kreisajā pusē tumšāks, brūngans knābis ar oranžām malām – mātītes; labajā – zaļgani dzeltens tēviņa knābis.",
+      "a": "pa kreisi"
     },
     "591": {
       "a": "atļauts atsevišķos gadījumos",
@@ -213,6 +214,32 @@
       "a": "krūšu plankuma formai un pēdu apmatojumam",
       "sec": "Medījamo dzīvnieku bioloģija,anatomija, fizioloģija, uzvedība un slimības",
       "note": "Šī jautājuma medības.lv nebija; pievienots no VMD faila. Meža caunai krūšu plankums dzeltenīgs un noapaļots, pēdas apmatotas; akmeņu caunai plankums balts, dakšveida."
+    },
+    {
+      "n": 967,
+      "after": 957,
+      "q": "Vai ir ētiski nomedīt stirnu āzi vai aļņu bulli ar nomestiem ragiem?",
+      "o": [
+        "Ja ir neizmantots savilcējs, to var darīt",
+        "Šāda rīcība ir neētiska",
+        "Jā, tas ir ētiski"
+      ],
+      "a": "Šāda rīcība ir neētiska",
+      "sec": "Medību veidi un paņēmieni, ētika",
+      "note": "Šī jautājuma VMD failā nav; pievienots no taurs.lv eksāmena testa."
+    },
+    {
+      "n": 968,
+      "after": 141,
+      "q": "Kuru no šiem putniem Latvijā atļauts medīt?",
+      "o": [
+        "mežirbi",
+        "laukirbi",
+        "abas iepriekšējās atbildes ir pareizas"
+      ],
+      "a": "mežirbi",
+      "sec": "Medību jomu regulējošo normatīvo aktu prasības",
+      "note": "Šī jautājuma variants pievienots no taurs.lv eksāmena testa. Laukirbe Latvijā nav medījama, mežirbe ir."
     }
   ]
 }
