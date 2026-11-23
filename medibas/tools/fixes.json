@@ -65,6 +65,14 @@
       "a": "4 gadu vecumam",
       "note": "Atbilde labota (medības.lv bija: „2 gadu vecumam”). Tas pats jautājums Nr. 347 atbildēts ar „4 gadu vecumam”; abām atbildēm jāsakrīt."
     },
+    "349": {
+      "a": "kur tiek saudzētas kazas un kazlēni",
+      "note": "Atbilde labota pēc taurs.lv eksāmena testa (medības.lv bija: „vietās, kur ir liels lūšu skaits”). Ja kazas un kazlēni tiek saudzēti, populācijā ir daudz jaunu āžu, un pēcnācējus atstāj arī āži, kas jaunāki par 2 gadiem."
+    },
+    "398": {
+      "a": "ragu gali ir tumši, strupi it kā apdeguši, aptrupējuši",
+      "note": "Atbilde labota pēc taurs.lv eksāmena testa (medības.lv bija: „ragi ir garāki par ausīm un to gali ir skaisti, gaiši pulēti ar lielu izvērsumu”). Perspektīvam jaunam bullim ragu gali ir tumši un strupi; gaiši, pulēti gali nav laba pazīme (sk. arī Nr. 403)."
+    },
     "446": {
       "o": [
         "aprīļa otrajā pusē, maijā",
@@ -303,6 +311,32 @@
       "a": "nebaidās no apdzīvotu vietu tuvuma",
       "sec": "Medījamo dzīvnieku bioloģija,anatomija, fizioloģija, uzvedība un slimības",
       "note": "Šī jautājuma VMD failā nav; pievienots no taurs.lv eksāmena testa."
+    },
+    {
+      "n": 972,
+      "after": 462,
+      "q": "Vai abi attēlā redzamie putni ir medījami?",
+      "o": [
+        "jā, abi ir lauči (jaunais un vecais putns)",
+        "nē, pa kreisi ir ūdensvistiņa (nemedījama)",
+        "nē, abi putni nav medījami"
+      ],
+      "a": "nē, pa kreisi ir ūdensvistiņa (nemedījama)",
+      "sec": "Medījamo dzīvnieku bioloģija,anatomija, fizioloģija, uzvedība un slimības",
+      "note": "Pievienots no taurs.lv eksāmena testa. Bildē: pa kreisi brūngans putns ar baltu zemasti un dzeltenzaļganu knābi – ūdensvistiņa (nemedījama); pa labi melns putns ar baltu knābi un baltu pieres plātni – laucis (medījams)."
+    },
+    {
+      "n": 973,
+      "after": 40,
+      "q": "Medījamo dzīvnieku sugas un medību termiņus nosaka:",
+      "o": [
+        "Ministru kabinets",
+        "Zemkopības ministrija",
+        "Vides aizsardzības un reģionālās attīstības ministrija"
+      ],
+      "a": "Ministru kabinets",
+      "sec": "Medību jomu regulējošo normatīvo aktu prasības",
+      "note": "Šī jautājuma VMD failā nav; pievienots no taurs.lv eksāmena testa. Medījamās sugas un termiņus nosaka Ministru kabineta noteikumi (Medību noteikumi)."
     }
   ]
 }
