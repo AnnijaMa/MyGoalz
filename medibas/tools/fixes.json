@@ -148,6 +148,14 @@
         "uzlabotu ložu trāpījuma blīvumu"
       ]
     },
+    "711": {
+      "a": "drīkst lielas jaudas ieročus",
+      "note": "Atbilde labota pēc taurs.lv eksāmena testa (medības.lv bija: „nedrīkst”). Medībās drīkst lietot lielas enerģijas pneimatiskos ieročus (sk. Nr. 191–192)."
+    },
+    "726": {
+      "a": "mednieka apliecība",
+      "note": "Atbilde labota pēc taurs.lv eksāmena testa (medības.lv bija: „izziņa par nokārtotu kvalifikācijas pārbaudījumu attiecībā uz ieroču un munīcijas aprites kārtību un apliecina prasmi rīkoties ar ieroci”). Ieroča iegādāšanās atļaujai medniekam vajag mednieka apliecību (sk. arī Nr. 45)."
+    },
     "807": {
       "a": "visas darbības jāsaskaņo ar meža īpašnieku",
       "note": "Atbilde labota (medības.lv bija: „infrastruktūras būvniecībai ar caurmēru 1,3 m augstumā mazāku par 10 cm (sausiem kokiem mazāku par 14)”). Jautājums ir par privātu mežu: tur viss jāsaskaņo ar meža īpašnieku (10 cm noteikums ir valsts mežos)."
@@ -200,9 +208,17 @@
       "a": "vidēja vecuma staltbriežu buļļi",
       "note": "Atbilde labota (medības.lv bija: „veci staltbriežu buļļi”). Veci buļļi bauro rupjāk un mazāk intensīvi (sk. Nr. 898)."
     },
+    "909": {
+      "a": "jā",
+      "note": "Atbilde labota pēc taurs.lv eksāmena testa (medības.lv bija: „nē”). Aļņi mēdz veidot ģimenes barus – govs ar teļiem un bullis."
+    },
     "924": {
       "a": "lapsas, Amerikas ūdeles, baibakus, jenotsuņus, ondatras, bebrus",
       "note": "Atbilde labota (medības.lv bija: „Amerikas ūdeles, jenotsuņus, ūdrus, bebrus, lapsas, āpšus, seskus”). Ūdrs ir aizsargājama suga, meža cūkas ar medību rīkiem nemedī."
+    },
+    "963": {
+      "a": "par dižmedījumu uzskata vilku",
+      "note": "Atbilde labota pēc taurs.lv eksāmena testa (medības.lv bija: „nē”). Vilks ir dižmedījums, bebrs nav."
     }
   },
   "add": [
@@ -244,6 +260,45 @@
       "a": "mežirbi",
       "sec": "Medību jomu regulējošo normatīvo aktu prasības",
       "note": "Šī jautājuma variants pievienots no taurs.lv eksāmena testa. Laukirbe Latvijā nav medījama, mežirbe ir."
+    },
+    {
+      "n": 969,
+      "after": 193,
+      "q": "Ūdensputnus Latvijā atļauts medīt",
+      "o": [
+        "individuālajās medībās",
+        "kolektīvajās medībās",
+        "atkarībā no medību dalībnieku skaita gan individuālajās, gan kolektīvajās medībās"
+      ],
+      "a": "individuālajās medībās",
+      "sec": "Medību veidi un paņēmieni, ētika",
+      "note": "Šī jautājuma VMD failā nav; pievienots no taurs.lv eksāmena testa."
+    },
+    {
+      "n": 970,
+      "after": 803,
+      "q": "Barotavas konstrukcija nodrošina, ka barība atrodas",
+      "o": [
+        "vismaz viena metra augstumā virs zemes un tai nevar piekļūt mežacūka",
+        "vismaz viena metra augstumā virs zemes un tai var piekļūt mežacūka",
+        "uz zemes un tai nevar piekļūt mežacūka"
+      ],
+      "a": "vismaz viena metra augstumā virs zemes un tai nevar piekļūt mežacūka",
+      "sec": "Medību infrastruktūra un tās veidošana",
+      "note": "Šī jautājuma VMD failā nav; pievienots no taurs.lv eksāmena testa."
+    },
+    {
+      "n": 971,
+      "after": 479,
+      "q": "Atšķirības zeltainā šakāļa un vilka dzīves vietas izvēlē",
+      "o": [
+        "nebaidās no apdzīvotu vietu tuvuma",
+        "nekad neapmetās apdzīvotu vietu tuvumā",
+        "apmetās tikai apdzīvotās vietās"
+      ],
+      "a": "nebaidās no apdzīvotu vietu tuvuma",
+      "sec": "Medījamo dzīvnieku bioloģija,anatomija, fizioloģija, uzvedība un slimības",
+      "note": "Šī jautājuma VMD failā nav; pievienots no taurs.lv eksāmena testa."
     }
   ]
 }
