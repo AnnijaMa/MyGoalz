@@ -12,12 +12,36 @@
       "a": "medību procesā iegūtās medību trofejas, gaļa un subprodukti",
       "note": "Atbilde labota (medības.lv bija: „medījamo dzīvnieku gaļa, ragi kopā ar galvaskausu (augšžokli vai pieres kaulu), ilkņi, galvaskausi un ādas”). Medību likuma definīcija; tāpat atbildēts jautājumā Nr. 11."
     },
+    "20": {
+      "a": "medījamo dzīvnieku ragi kopā ar galvaskausu (augšžokli vai pieres kaulu), ilkņi, galvaskausi, ādas",
+      "note": "Pārbaudīts pēc likuma (Medību likums 1. p. 11. pk.). Atbilde labota (iepriekš bija: „nomedīto medījamo dzīvnieku ragi kopā ar galvaskausu (augšžokli vai pieres kaulu), ilkņi, galvaskausi, ādas, dzīvnieku nomestie ragi”). Medību trofejas: ragi kopā ar galvaskausu, ilkņi, galvaskausi un ādas – nomestie ragi definīcijā nav."
+    },
     "27": {
       "note": "VMD failā šī jautājuma teksts neatbilst atbildēm (atbildes ir no jautājuma „Medībām pielīdzināma”, Nr. 26)."
+    },
+    "28": {
+      "a": "abas iepriekšējās atbildes ir pareizas",
+      "note": "Pārbaudīts pēc likuma (Medību likums 3. p. 3. d. 3. pk.). Atbilde labota (iepriekš bija: „vietā, kur nu nav reģistrēts medību iecirknis, izņemot nelimitēto medījamo dzīvnieku medības publiskajās ūdenstilpēs un to tauvas joslā”). Abi izņēmumi ir likumā: a) medības ar medību tiesību īpašnieka līdzdalību, b) publiskās ūdenstilpes un tauvas josla."
+    },
+    "36": {
+      "a": "piesavināties",
+      "note": "Pārbaudīts pēc likuma (Medību likums 5. p. 1. d.). Atbilde labota (iepriekš bija: „abas iepriekšējās atbildes ir pareizas”). Aizliegts ir piesavināties; pārdot medību produkciju nav aizliegts."
+    },
+    "41": {
+      "a": "abas iepriekšējās atbildes ir pareizas",
+      "note": "Pārbaudīts pēc likuma (Medību likums 9. p. 2. d.). Atbilde labota (iepriekš bija: „pastiprināta robežkontrole, ārkārtas situācija, izņēmuma stāvoklis”). Likumā minētas gan pastiprināta robežkontrole, ārkārtas situācija, izņēmuma stāvoklis, gan Valsts robežsardzes taktiskās mācības."
     },
     "42": {
       "a": "nepieciešama Valsts meža dienesta ikreizēja atļauja",
       "note": "Atbilde labota (medības.lv bija: „nepieciešama Dabas aizsardzības pārvaldes ikreizēja atļauja”). Medījamo dzīvnieku ievešanai vajag VMD atļauju (sk. Nr. 43); Dabas aizsardzības pārvalde izsniedz atļaujas nemedījamām sugām (Nr. 44)."
+    },
+    "48": {
+      "a": "Valsts policijas iestādes izsniegta medību šaujamieroča glabāšanas atļauja",
+      "note": "Pārbaudīts pēc likuma (Medību likums 13. p. 1. d.). Atbilde labota (iepriekš bija: „Valsts meža dienesta izsniegta mednieka apliecība, mednieka sezonas karte un medību atļauja”). Likums: medīt ar medību šaujamieročiem drīkst mednieki, kuriem ir Valsts policijas izsniegta medību šaujamieroča glabāšanas atļauja."
+    },
+    "70": {
+      "a": "1000 hektāriem, ieskaitot tikai meža masīvus vai to daļas un atsevišķus meža gabalus (pudurus), krūmājus un purvus",
+      "note": "Pārbaudīts pēc likuma (Medību likums 19. p. 1. d. 2.1 pk.). Atbilde labota (iepriekš bija: „1000 hektāriem, tai skaitā ne mazāk kā 200 hektāru meža zemes, krūmāju un purvu”). Staltbriežu govīm un teļiem – ne mazāk kā 1000 ha, ieskaitot tikai meža masīvus, meža gabalus (pudurus), krūmājus un purvus."
     },
     "106": {
       "a": "lapsu un jenotsuņu medībās",
@@ -27,16 +51,32 @@
       "q": "Kurš no šiem medību rīkiem ir aizliegts?"
     },
     "135": {
-      "a": "nav medījamais dzīvnieks",
-      "note": "Atbilde labota (medības.lv bija: „jā”). Medījami ir tikai medņu gaiļi; medņu vista nav medījamais dzīvnieks."
+      "a": "jā",
+      "note": "Pārbaudīts pēc likuma (Medību noteikumi 3.1.6.). Atbilde labota (iepriekš bija: „nav medījamais dzīvnieks”). Limitētie medījamie dzīvnieki ir „medņi un rubeņi” bez dzimuma ierobežojuma, tātad arī medņu vista. (Iepriekšējais labojums „nav medījamais” bija kļūdains.)"
     },
     "136": {
-      "a": "nav medījamais dzīvnieks",
-      "note": "Atbilde labota (medības.lv bija: „jā”). Medījami ir tikai rubeņu gaiļi; rubeņu vista nav medījamais dzīvnieks."
+      "a": "jā",
+      "note": "Pārbaudīts pēc likuma (Medību noteikumi 3.1.6.). Atbilde labota (iepriekš bija: „nav medījamais dzīvnieks”). Limitētie medījamie dzīvnieki ir „medņi un rubeņi” bez dzimuma ierobežojuma, tātad arī rubeņu vista. (Iepriekšējais labojums „nav medījamais” bija kļūdains.)"
+    },
+    "149": {
+      "a": "līguma iesniegšanas Valsts meža dienestā un reģistrēšanas medību iecirkņa sastāvā, izņemot gadījumu, ja tiek medīti nelimitētie medījamie dzīvnieki",
+      "note": "Pārbaudīts pēc likuma (Medību noteikumi 15. p.). Atbilde labota (iepriekš bija: „līguma iesniegšanas Valsts meža dienestā un reģistrēšanas medību iecirkņa sastāvā”). Noteikumos ir izņēmums nelimitēto medījamo dzīvnieku medībām."
+    },
+    "152": {
+      "a": "medību sākuma laiku (brīdi, kad tiek uzsāktas medības) un medību beigu laiku, kā arī medību pārtraukumus",
+      "note": "Pārbaudīts pēc likuma (Medību noteikumi 26. p.). Atbilde labota (iepriekš bija: „tos nomedītos medījamos dzīvniekus, kuru nomedīšanai medību tiesību lietotājs Valsts meža dienestā saņēmis medību atļaujas”). Medību pārskatā norāda medību sākuma un beigu laiku un pārtraukumus."
+    },
+    "167": {
+      "a": "jā",
+      "note": "Pārbaudīts pēc likuma (Medību noteikumi 50. p.). Atbilde labota (iepriekš bija: „nē”). „Individuālajās medībās medniekam ir saistoši medību vadītāja pienākumi.”"
     },
     "170": {
       "a": "noteikt medību sākuma laiku, beigu laiku un medību pārtraukumus",
       "note": "Atbilde labota pēc taurs.lv eksāmena testa (medības.lv bija: „abas iepriekšējās atbildes ir pareizas”). Pārtraukt medības vai aizliegt tās turpināt atsevišķiem dalībniekiem ir medību vadītāja TIESĪBAS, nevis pienākums."
+    },
+    "185": {
+      "a": "pēc mednieka izvēles",
+      "note": "Pārbaudīts pēc likuma (Medību noteikumi 66. p.). Atbilde labota (iepriekš bija: „līdz 15 metriem - ar medību lodi vai renkuļiem, tālākā distancē tikai ar medību lodi”). Kalibra un munīcijas ierobežojumi noteikti tikai mežacūkām, aļņiem un staltbriežiem; stirnām ierobežojumu nav (sk. arī Nr. 186)."
     },
     "186": {
       "o": [
@@ -90,6 +130,14 @@
       "note": "Atbilde labota pēc taurs.lv eksāmena testa (medības.lv bija: „pa labi”). Eksāmenā pie šī jautājuma ir bilde: kreisajā pusē tumšāks, brūngans knābis ar oranžām malām – mātītes; labajā – zaļgani dzeltens tēviņa knābis.",
       "a": "pa kreisi"
     },
+    "568": {
+      "a": "jā, ja medījamo dzīvnieku lenc vienatnē",
+      "note": "Pārbaudīts pēc likuma (Medību noteikumi 57. p.). Atbilde labota (iepriekš bija: „nē”). „Medniekam, vienatnē lencot medījamo dzīvnieku, atļauts pārvietoties ar pielādētu ieroci.”"
+    },
+    "569": {
+      "a": "atļauts pārvietoties ar pielādētu medību šaujamieroci, ja klāt nav citu mednieku",
+      "note": "Pārbaudīts pēc likuma (Medību noteikumi 57. p.). Atbilde labota (iepriekš bija: „aizliegts pārvietoties ar pielādētu medību šaujamieroci”). Vienatnē lencot medījamo dzīvnieku, atļauts pārvietoties ar pielādētu ieroci."
+    },
     "591": {
       "a": "atļauts atsevišķos gadījumos",
       "note": "Atbilde labota (medības.lv bija: „aizliegts”). Izņēmumi pastāv: dzinējs ir viens mednieks ar medību suni vai 1–2 mednieki ar medību vadītāja atļauju izseko ievainotu dzīvnieku (sk. Nr. 663)."
@@ -115,7 +163,9 @@
         "atļautas",
         "atļautas tikai staltbriežu buļļu medības",
         "nav atļautas"
-      ]
+      ],
+      "a": "atļautas tikai staltbriežu buļļu medības",
+      "note": "Pārbaudīts pēc likuma (Medību noteikumi 80. p.). Atbilde labota (iepriekš bija: „nav atļautas”). Naktī medīt atļauts tikai no ≥2,5 m paaugstinājuma, izņemot aļņu un staltbriežu buļļu medības no 1. septembra līdz 15. oktobrim (un ūdensputnu medības)."
     },
     "614": {
       "a": "ar pielādētu medību šaujamieroci no mugurpuses",
@@ -135,6 +185,10 @@
         "ja ierocis ir nodrošināts, tad abas atbildes ir pareizas",
         "pielādētu"
       ]
+    },
+    "652": {
+      "a": "pielādētu medību šaujamieroci",
+      "note": "Pārbaudīts pēc likuma (Medību noteikumi 57. p.). Atbilde labota (iepriekš bija: „izlādētu medību šaujamieroci”). „Medniekam, vienatnē lencot medījamo dzīvnieku, atļauts pārvietoties ar pielādētu ieroci.”"
     },
     "671": {
       "a": "pastāvīgi ieslēgtu gaismas avotu",
@@ -167,6 +221,17 @@
       "a": "mednieka apliecība",
       "note": "Atbilde labota pēc taurs.lv eksāmena testa (medības.lv bija: „izziņa par nokārtotu kvalifikācijas pārbaudījumu attiecībā uz ieroču un munīcijas aprites kārtību un apliecina prasmi rīkoties ar ieroci”). Ieroča iegādāšanās atļaujai medniekam vajag mednieka apliecību (sk. arī Nr. 45)."
     },
+    "728": {
+      "a": "21 gadu vecuma",
+      "note": "Pārbaudīts pēc likuma (Ieroču aprites likums 14. p. 9. d.). Atbilde labota (iepriekš bija: „18 gadu vecuma”). B un C kategorijas garstobra–vītņstobra medību šaujamieročus var iegādāties, ja sasniegts 21 gada vecums."
+    },
+    "759": {
+      "note": "Uzmanību: pašreizējais Ieroču aprites likums (35. p. 6. d.) atļauj iegādāties un seifā glabāt līdz 30 kg šaujampulvera. Atbilde „trīs kilogrami” var būt no vecākiem noteikumiem."
+    },
+    "776": {
+      "a": "mednieka apliecība, mednieka sezonas karte",
+      "note": "Pārbaudīts pēc likuma (Medību likums 21. p. un 24. p.; Medību noteikumi 92. p.). Atbilde labota (iepriekš bija: „mednieka apliecība, mednieka sezonas karte, medību atļauja”). Ar medību rīkiem medī tikai nelimitētos dzīvniekus, kam vajag mednieka apliecību un sezonas karti; medību atļauja nav vajadzīga."
+    },
     "807": {
       "a": "visas darbības jāsaskaņo ar meža īpašnieku",
       "note": "Atbilde labota (medības.lv bija: „infrastruktūras būvniecībai ar caurmēru 1,3 m augstumā mazāku par 10 cm (sausiem kokiem mazāku par 14)”). Jautājums ir par privātu mežu: tur viss jāsaskaņo ar meža īpašnieku (10 cm noteikums ir valsts mežos)."
@@ -198,6 +263,14 @@
         "sunim vispirms ēdiens jānopelna"
       ]
     },
+    "837": {
+      "a": "vakcināciju apliecinošus dokumentu",
+      "note": "Pārbaudīts pēc likuma (Medību noteikumi 98. p.). Atbilde labota (iepriekš bija: „abus minētos dokumentus”). Noteikumos minēti tikai suņa vakcināciju apliecinošie dokumenti."
+    },
+    "838": {
+      "a": "ja medī ar suni alās",
+      "note": "Pārbaudīts pēc likuma (Medību noteikumi 97. p.). Atbilde labota (iepriekš bija: „abi varianti pareizi”). Vienīgais izņēmums ir medības ar suņiem alās."
+    },
     "865": {
       "o": [
         "augumā mazāki par vidējo, apmatojums spožs, melns, ar krasi norobežotiem rūsganiem plankumiem uz galvas, krūtīm un kājām",
@@ -215,6 +288,10 @@
       "a": "lielais medījamais dzīvnieks",
       "note": "Atbilde labota (medības.lv bija: „mazais medījamais dzīvnieks”). ES regulā 853/2004 mazie medījamie dzīvnieki ir tikai putni un zaķveidīgie; bebrs pārtikas apritē ir lielais medījamais dzīvnieks."
     },
+    "892": {
+      "a": "pieejot, gaidot pārejas vietās, no torņa vai luktas",
+      "note": "Pārbaudīts pēc likuma (Medību noteikumi 80. p.). Atbilde labota (iepriekš bija: „tikai torņa vai luktas, medniekam atrodoties vismaz 2,5 m virs zemes”). Staltbriežu buļļiem no 1. septembra līdz 15. oktobrim 2,5 m paaugstinājuma prasība naktī neattiecas. Govīm tā attiecas (sk. Nr. 610)."
+    },
     "894": {
       "a": "vidēja vecuma staltbriežu buļļi",
       "note": "Atbilde labota (medības.lv bija: „veci staltbriežu buļļi”). Veci buļļi bauro rupjāk un mazāk intensīvi (sk. Nr. 898)."
@@ -222,6 +299,10 @@
     "909": {
       "a": "jā",
       "note": "Atbilde labota pēc taurs.lv eksāmena testa (medības.lv bija: „nē”). Aļņi mēdz veidot ģimenes barus – govs ar teļiem un bullis."
+    },
+    "921": {
+      "a": "nē",
+      "note": "Pārbaudīts pēc likuma (Medību noteikumi 80.–81. p.). Atbilde labota (iepriekš bija: „jā”). Naktī medīt ar ieročiem atļauts tikai no ≥2,5 m paaugstinājuma; mežacūku pieiešana naktī nav atļauta."
     },
     "924": {
       "a": "lapsas, Amerikas ūdeles, baibakus, jenotsuņus, ondatras, bebrus",
